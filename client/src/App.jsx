@@ -9,7 +9,7 @@ import About from './pages/About/About'
 import Search from './pages/Search/Search'
 import MuscleGroup from './pages/Exercises/MuscleGroup'
 import ExerciseInstance from './pages/Exercises/ExerciseInstance'
-import Layout from './components/Layout'
+import Layout from './Layout'
 import NotFound from './pages/NotFound'
 import "./App.css"
 
