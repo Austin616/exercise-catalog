@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FaBars, FaSearch } from "react-icons/fa";
-import { FaUser } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FaBars, FaSearch } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const [isVisible, setIsVisible] = useState(true);
 
   const getLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -33,8 +34,34 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // Only hide during hero section on home page
+      if (location.pathname === '/') {
+        const scrollPosition = window.scrollY;
+        const viewportHeight = window.innerHeight;
+        // Show navbar after hero section (100vh)
+        setIsVisible(scrollPosition > viewportHeight - 100);
+      } else {
+        // Always show navbar on other pages
+        setIsVisible(true);
+      }
+    };
+
+    // Initial check
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
+
   return (
-    <div className="py-4 px-8 flex items-center bg-gray-800 text-white relative">
+    <div 
+      className={`fixed top-0 left-0 right-0 z-50 py-4 px-8 flex items-center bg-gray-800 text-white transition-all duration-500 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 -translate-y-full pointer-events-none'
+      }`}
+    >
       {/* Logo */}
       <div className="flex items-center flex-shrink-0">
         <Link
@@ -58,6 +85,7 @@ const Navbar = () => {
           About
         </Link>
       </div>
+
       {/* Right side (Search Bar + Profile) */}
       <div className="hidden md:flex items-center space-x-4 ml-auto">
         {/* Search Bar */}
@@ -98,11 +126,8 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div
         className={`absolute top-16 left-0 w-full bg-gray-800 flex flex-col items-center space-y-4 py-4 transform transition-all duration-300 ease-in-out
-  ${
-    isOpen
-      ? "opacity-100 translate-y-0"
-      : "opacity-0 -translate-y-4 pointer-events-none"
-  }`}
+          ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
       >
         <Link
           to="/"
@@ -138,8 +163,8 @@ const Navbar = () => {
           onClick={() => setIsOpen(false)}
         >
           <div className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4">
-          <FaUser className="text-white" size={15} />
-          <span className="ml-2">Profile</span>
+            <FaUser className="text-white" size={15} />
+            <span className="ml-2">Profile</span>
           </div>
         </Link>
       </div>

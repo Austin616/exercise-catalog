@@ -9,6 +9,7 @@ import About from './pages/About/About'
 import Search from './pages/Search/Search'
 import MuscleGroup from './pages/Exercises/MuscleGroup'
 import ExerciseInstance from './pages/Exercises/ExerciseInstance'
+import Layout from './components/Layout'
 import NotFound from './pages/NotFound'
 import "./App.css"
 
@@ -19,13 +20,13 @@ const App = () => {
         <Navbar />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/exercises" element={<Exercises />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="*" element={<NotFound/>} />
-            <Route path="/exercises/:id" element={<MuscleGroup/>} />
-            <Route path="/exercises/instance/:id" element={<ExerciseInstance/>} />
+            <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/exercises" element={<Layout><Exercises /></Layout>} />
+            <Route path="/about" element={<Layout><About /></Layout>} />
+            <Route path="/search" element={<Layout><Search /></Layout>} />
+            <Route path="*" element={<Layout><NotFound/></Layout>} />
+            <Route path="/exercises/:id" element={<Layout><MuscleGroup/></Layout>} />
+            <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} />
           </Routes>
         </main>
         <Footer />
