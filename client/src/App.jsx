@@ -26,7 +26,7 @@ const App = () => {
             <Route path="/search" element={<Layout><Search /></Layout>} />
             <Route path="*" element={<Layout><NotFound/></Layout>} />
             <Route path="/exercises/:id" element={<Layout><MuscleGroup/></Layout>} />
-            <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} />
+            <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} /> 
           </Routes>
         </main>
         <Footer />
