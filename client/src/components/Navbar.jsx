@@ -98,23 +98,49 @@ const Navbar = () => {
       {/* Mobile Menu */}
       <div
         className={`absolute top-16 left-0 w-full bg-gray-800 flex flex-col items-center space-y-4 py-4 transform transition-all duration-300 ease-in-out
-        ${
-          isOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4 pointer-events-none"
-        }`}
+  ${
+    isOpen
+      ? "opacity-100 translate-y-0"
+      : "opacity-0 -translate-y-4 pointer-events-none"
+  }`}
       >
-        <Link to="/" onClick={() => setIsOpen(false)}>
+        <Link
+          to="/"
+          className={getLinkClass("/")}
+          onClick={() => setIsOpen(false)}
+        >
           Home
         </Link>
-        <Link to="/exercises" onClick={() => setIsOpen(false)}>
+        <Link
+          to="/exercises"
+          className={getLinkClass("/exercises")}
+          onClick={() => setIsOpen(false)}
+        >
           Exercises
         </Link>
-        <Link to="/about" onClick={() => setIsOpen(false)}>
+        <Link
+          to="/about"
+          className={getLinkClass("/about")}
+          onClick={() => setIsOpen(false)}
+        >
           About
         </Link>
-        <Link to="/search" onClick={() => setIsOpen(false)}>
+        <Link
+          to="/search"
+          className={getLinkClass("/search")}
+          onClick={() => setIsOpen(false)}
+        >
           Search
+        </Link>
+        <Link
+          to="/profile"
+          className={getLinkClass("/profile")}
+          onClick={() => setIsOpen(false)}
+        >
+          <div className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4">
+          <FaUser className="text-white" size={15} />
+          <span className="ml-2">Profile</span>
+          </div>
         </Link>
       </div>
     </div>

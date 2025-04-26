@@ -6,6 +6,7 @@ import Home from './pages/Home/Home'
 import Exercises from './pages/Exercises/Exercises'
 import About from './pages/About/About'
 import Search from './pages/Search/Search'
+import MuscleGroup from './pages/Exercises/MuscleGroup'
 import NotFound from './pages/NotFound'
 import "./App.css"
 
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/search" element={<Search />} />
         <Route path="*" element={<NotFound/>} />
+        <Route path="/exercises/:id" element={<MuscleGroup/>} />
       </Routes>
     </BrowserRouter>
   )
