@@ -49,9 +49,9 @@ const SearchBar = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mb-8">
+    <div className="w-full">
       {/* Search Input */}
-      <div className="mb-4 relative">
+      <div className="mb-4">
         <input
           type="text"
           placeholder={searchPlaceholder}
@@ -71,10 +71,10 @@ const SearchBar = ({
       </div>
 
       {/* Filters and Sort */}
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Filter Dropdowns */}
         {Object.entries(filterOptions).map(([category, options]) => (
-          <div key={category} className="flex-1 min-w-[200px]">
+          <div key={category}>
             <select
               value={filters[category]}
               onChange={(e) => handleFilterChange(category, e.target.value)}
@@ -93,7 +93,7 @@ const SearchBar = ({
         {/* Sort Dropdowns */}
         {sortOptions.length > 0 && (
           <>
-            <div className="flex-1 min-w-[200px]">
+            <div>
               <select
                 value={sortBy}
                 onChange={handleSortChange}
@@ -106,7 +106,7 @@ const SearchBar = ({
                 ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[200px]">
+            <div>
               <select
                 value={sortOrder}
                 onChange={handleSortOrderChange}

@@ -30,7 +30,7 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   return (
     <Link
       to={`/exercises/instance/${exercise.id}`}
-      className="group bg-white rounded-xl shadow-lg w-full aspect-[3/4] max-w-[300px] p-5 flex flex-col justify-between items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:ring-2 hover:ring-blue-300"
+      className="group bg-white rounded-xl shadow-lg w-full aspect-[3/4] max-w-[280px] p-5 flex flex-col justify-between items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:ring-2 hover:ring-blue-300"
     >
       
       {/* Image */}

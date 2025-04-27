@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaBars, FaSearch } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
 
@@ -7,6 +7,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const getLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -32,6 +34,14 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
   };
 
   useEffect(() => {
@@ -79,6 +89,9 @@ const Navbar = () => {
           Home
         </Link>
         <Link to="/exercises" className={getLinkClass("/exercises")}>
+        Muscle Groups
+        </Link>
+        <Link to="/search" className={getLinkClass("/search")}>
           Exercises
         </Link>
         <Link to="/about" className={getLinkClass("/about")}>
@@ -90,14 +103,21 @@ const Navbar = () => {
       <div className="hidden md:flex items-center space-x-4 ml-auto">
         {/* Search Bar */}
         <div className="flex items-center bg-gray-700 rounded-lg overflow-hidden">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="px-2 py-2 bg-transparent text-white focus:outline-none"
-          />
-          <button className="p-4 bg-gray-600 hover:bg-gray-500 transition duration-300 cursor-pointer">
-            <FaSearch className="text-white" />
-          </button>
+          <form onSubmit={handleSearch} className="flex items-center">
+            <input
+              type="text"
+              placeholder="Search exercises..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-2 py-2 bg-transparent text-white focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="p-4 bg-gray-600 hover:bg-gray-500 transition duration-300 cursor-pointer"
+            >
+              <FaSearch className="text-white" />
+            </button>
+          </form>
         </div>
 
         {/* Profile Button */}

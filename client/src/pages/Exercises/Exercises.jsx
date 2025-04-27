@@ -1,123 +1,114 @@
 import React, { useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import exerciseJson from '../../../../backend/dist/exercises.json'
 import MuscleGroupCard from './components/MuscleGroupCard'
+import MuscleGroupListItem from './components/MuscleGroupListItem'
 import Pagination from '../../components/Pagination'
-import SearchBar from '../../components/SearchBar'
+import ViewControls from '../../components/ViewControls'
 
 const Exercises = () => {
-  const allPrimaryMuscles = exerciseJson.flatMap(e => e.primaryMuscles)
-  const uniquePrimaryMuscles = [...new Set(allPrimaryMuscles)]
+  const [viewMode, setViewMode] = useState('grid')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(12)
+
+  // Get unique muscle groups
+  const muscleGroups = useMemo(() => {
+    const allMuscles = exerciseJson.reduce((acc, ex) => {
+      return [...acc, ...ex.primaryMuscles]
+    }, [])
+    return [...new Set(allMuscles)].sort()
+  }, [])
 
   // Calculate exercise counts for each muscle group
-  const muscleGroupCounts = uniquePrimaryMuscles.reduce((acc, muscle) => {
-    acc[muscle] = exerciseJson.filter(exercise => 
-      exercise.primaryMuscles.includes(muscle)
-    ).length
-    return acc
-  }, {})
+  const muscleGroupCounts = useMemo(() => {
+    return muscleGroups.reduce((acc, muscle) => {
+      acc[muscle] = exerciseJson.filter(exercise => 
+        exercise.primaryMuscles.includes(muscle)
+      ).length
+      return acc
+    }, {})
+  }, [muscleGroups])
 
   // Find the muscle group with the most exercises
-  const maxMuscleGroup = Object.entries(muscleGroupCounts)
-    .reduce((max, [muscle, count]) => 
-      count > (max.count || 0) ? { muscle, count } : max, 
-      { muscle: '', count: 0 }
-    ).muscle
+  const maxMuscleGroup = useMemo(() => {
+    return Object.entries(muscleGroupCounts).reduce((max, [muscle, count]) => {
+      return count > (muscleGroupCounts[max] || 0) ? muscle : max
+    }, '')
+  }, [muscleGroupCounts])
 
-  // State for search, filter, and sort
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState({
-    force: 'all',
-    equipment: 'all',
-    level: 'all',
-    category: 'all'
-  })
-  const [sortOrder, setSortOrder] = useState('asc')
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 9
+  // Pagination calculations
+  const totalPages = Math.ceil(muscleGroups.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentMuscles = muscleGroups.slice(startIndex, endIndex)
 
-  // Filter and sort muscle groups
-  const filteredMuscles = useMemo(() => {
-    let result = uniquePrimaryMuscles;
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage)
+  }
 
-    // Apply search filter
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      result = result.filter(muscle => 
-        muscle.toLowerCase().includes(searchLower)
-      );
-    }
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
+  }
 
-    // Apply category filters
-    Object.entries(filters).forEach(([category, value]) => {
-      if (value !== 'all') {
-        result = result.filter(muscle => {
-          const exercises = exerciseJson.filter(ex => 
-            ex.primaryMuscles.includes(muscle)
-          );
-          return exercises.some(ex => ex[category] === value);
-        });
-      }
-    });
-
-    // Apply sorting
-    result.sort((a, b) => {
-      const countA = muscleGroupCounts[a];
-      const countB = muscleGroupCounts[b];
-      return sortOrder === 'asc' ? countA - countB : countB - countA;
-    });
-
-    return result;
-  }, [searchTerm, filters, sortOrder, uniquePrimaryMuscles, muscleGroupCounts]);
-
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentMuscles = filteredMuscles.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filteredMuscles.length / itemsPerPage);
-
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-    setCurrentPage(1); // Reset to first page when searching
-  };
-
-  const handleFilter = (newFilters) => {
-    setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filtering
-  };
-
-  const handleSort = (order) => {
-    setSortOrder(order);
-    setCurrentPage(1); // Reset to first page when sorting
-  };
+  const handleViewModeChange = (newViewMode) => {
+    setViewMode(newViewMode)
+  }
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center">
-      <SearchBar
-        onSearch={handleSearch}
-      />
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl">
-        {currentMuscles.length > 0 ? (
-          currentMuscles.map((muscle, i) => (
-            <MuscleGroupCard 
-              key={i} 
-              muscleGroup={muscle} 
-              maxMuscleGroup={maxMuscleGroup}
-              searchTerm={searchTerm}
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto flex flex-col items-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Exercises</h1>
+
+        {/* View Controls */}
+        <div className="mb-6 w-full flex justify-center">
+          <div className="w-full max-w-3xl">
+            <ViewControls
+              viewMode={viewMode}
+              onViewModeChange={handleViewModeChange}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
             />
-          ))
+          </div>
+        </div>
+
+        {/* Muscle Groups Grid/List */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl justify-center mx-auto">
+            {currentMuscles.map((muscle) => (
+              <MuscleGroupCard
+                key={muscle}
+                muscleGroup={muscle}
+                maxMuscleGroup={maxMuscleGroup}
+                count={muscleGroupCounts[muscle]}
+                viewMode={viewMode}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="col-span-full text-center text-gray-500 text-xl flex flex-col items-center gap-4">
-            <span className="text-6xl">😢</span>
-            <p>No muscle groups found</p>
+          <div className="space-y-4 w-full max-w-2xl mx-auto">
+            {currentMuscles.map((muscle) => (
+              <MuscleGroupListItem
+                key={muscle}
+                muscleGroup={muscle}
+                count={muscleGroupCounts[muscle]}
+                isMostPopular={muscle === maxMuscleGroup}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {muscleGroups.length > 0 && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           </div>
         )}
       </div>
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={page => setCurrentPage(page)}
-      />
     </div>
   )
 }

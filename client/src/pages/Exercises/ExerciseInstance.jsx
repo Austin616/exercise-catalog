@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import exerciseJson from "../../../../backend/dist/exercises.json";
 import BackButton from "../../components/BackButton";
 import { tagColors } from "../../utils/tagColors";
+import RelatedExercises from "./components/RelatedExercises";
+import ExerciseVideo from "./components/ExerciseVideo";
 
 const ExerciseInstance = () => {
   const { id } = useParams();
@@ -64,6 +66,9 @@ const ExerciseInstance = () => {
           </div>
         </div>
       </div>
+
+      {/* Exercise Video */}
+      <ExerciseVideo exerciseName={exercise.name} />
 
       {/* Exercise Details Grid */}
       <div className="grid grid-cols-2 gap-6 mb-8">
@@ -144,6 +149,9 @@ const ExerciseInstance = () => {
           </div>
         </div>
       ))}
+
+      {/* Related Exercises */}
+      <RelatedExercises currentExercise={exercise} />
     </div>
   );
 };
