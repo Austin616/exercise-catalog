@@ -11,6 +11,7 @@ import About from './pages/About/About'
 import Search from './pages/Search/Search'
 import MuscleGroup from './pages/Exercises/MuscleGroup'
 import ExerciseInstance from './pages/Exercises/ExerciseInstance'
+import Favorites from './pages/Favorites/Favorites'
 import Layout from './Layout'
 import NotFound from './pages/NotFound'
 import "./App.css"
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/exercises" element={<Layout><Exercises /></Layout>} />
             <Route path="/about" element={<Layout><About /></Layout>} />
             <Route path="/search" element={<Layout><Search /></Layout>} />
+            <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
             <Route path="*" element={<Layout><NotFound/></Layout>} />
             <Route path="/exercises/:id" element={<Layout><MuscleGroup/></Layout>} />
             <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} /> 

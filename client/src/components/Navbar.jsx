@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBars, FaSearch } from 'react-icons/fa';
+import { FaBars, FaSearch, FaHeart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
@@ -9,6 +9,11 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+
+  const handleNavClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsOpen(false);
+  };
 
   const getLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -41,6 +46,7 @@ const Navbar = () => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -77,6 +83,7 @@ const Navbar = () => {
         <Link
           to="/"
           className="font-bold flex items-center space-x-2 text-white hover:text-blue-400 transition-colors duration-300"
+          onClick={handleNavClick}
         >
           <img src="/image.png" alt="GymAtlas Logo" width={40} />
           <span>GymAtlas</span>
@@ -85,21 +92,21 @@ const Navbar = () => {
 
       {/* Desktop Navigation Links */}
       <div className="hidden md:flex space-x-8 absolute left-1/2 transform -translate-x-1/2">
-        <Link to="/" className={getLinkClass("/")}>
+        <Link to="/" className={getLinkClass("/")} onClick={handleNavClick}>
           Home
         </Link>
-        <Link to="/exercises" className={getLinkClass("/exercises")}>
-        Muscle Groups
+        <Link to="/exercises" className={getLinkClass("/exercises")} onClick={handleNavClick}>
+          Categories
         </Link>
-        <Link to="/search" className={getLinkClass("/search")}>
-          Exercises
+        <Link to="/search" className={getLinkClass("/search")} onClick={handleNavClick}>
+          Browse
         </Link>
-        <Link to="/about" className={getLinkClass("/about")}>
+        <Link to="/about" className={getLinkClass("/about")} onClick={handleNavClick}>
           About
         </Link>
       </div>
 
-      {/* Right side (Search Bar + Profile) */}
+      {/* Right side (Search Bar + Icons) */}
       <div className="hidden md:flex items-center space-x-4 ml-auto">
         {/* Search Bar */}
         <div className="flex items-center bg-gray-700 rounded-lg overflow-hidden">
@@ -120,10 +127,20 @@ const Navbar = () => {
           </form>
         </div>
 
+        {/* Favorites Button */}
+        <Link
+          to="/favorites"
+          className={`flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2 ${location.pathname === '/favorites' ? 'ring-2 ring-red-500' : ''}`}
+          onClick={handleNavClick}
+        >
+          <FaHeart className={`${location.pathname === '/favorites' ? 'text-red-500' : 'text-white'} hover:text-red-500 transition-colors duration-300`} size={25} />
+        </Link>
+
         {/* Profile Button */}
         <Link
           to="/profile"
           className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2"
+          onClick={handleNavClick}
         >
           <FaUser className="text-white" size={25} />
         </Link>
@@ -152,41 +169,51 @@ const Navbar = () => {
         <Link
           to="/"
           className={getLinkClass("/")}
-          onClick={() => setIsOpen(false)}
+          onClick={handleNavClick}
         >
           Home
         </Link>
         <Link
           to="/exercises"
           className={getLinkClass("/exercises")}
-          onClick={() => setIsOpen(false)}
+          onClick={handleNavClick}
         >
-          Exercises
+          Categories
         </Link>
         <Link
           to="/about"
           className={getLinkClass("/about")}
-          onClick={() => setIsOpen(false)}
+          onClick={handleNavClick}
         >
           About
         </Link>
         <Link
           to="/search"
           className={getLinkClass("/search")}
-          onClick={() => setIsOpen(false)}
+          onClick={handleNavClick}
         >
-          Search
+          Browse
         </Link>
-        <Link
-          to="/profile"
-          className={getLinkClass("/profile")}
-          onClick={() => setIsOpen(false)}
-        >
-          <div className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4">
+
+        {/* Mobile Icons */}
+        <div className="flex space-x-4">
+          <Link
+            to="/favorites"
+            className={`flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4 ${location.pathname === '/favorites' ? 'ring-2 ring-red-500' : ''}`}
+            onClick={handleNavClick}
+          >
+            <FaHeart className={`${location.pathname === '/favorites' ? 'text-red-500' : 'text-white'} hover:text-red-500 transition-colors duration-300`} size={15} />
+            <span className="ml-2">Favorites</span>
+          </Link>
+          <Link
+            to="/profile"
+            className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4"
+            onClick={handleNavClick}
+          >
             <FaUser className="text-white" size={15} />
             <span className="ml-2">Profile</span>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
     </div>
   );
