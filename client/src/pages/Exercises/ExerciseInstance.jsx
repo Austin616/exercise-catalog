@@ -5,12 +5,15 @@ import BackButton from "../../components/BackButton";
 import { tagColors } from "../../utils/tagColors";
 import RelatedExercises from "./components/RelatedExercises";
 import ExerciseVideo from "./components/ExerciseVideo";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ExerciseInstance = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const exercise = exerciseJson.find(ex => ex.id === id);
   const [activeImage, setActiveImage] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleMuscleClick = (muscle) => {
     // Smooth scroll to top
@@ -20,6 +23,39 @@ const ExerciseInstance = () => {
     });
     // Navigate to muscle page
     navigate(`/exercises/${muscle.toLowerCase().replace(/\s+/g, '-')}`);
+  };
+
+  const handleFavoriteClick = () => {
+    setIsFavorite(!isFavorite);
+    // Show toast notification
+    toast(
+      <div className="flex items-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5 mr-2 text-red-500"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <span>{isFavorite ? 'Removed from favorites' : 'Added to favorites'}</span>
+      </div>,
+      {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      }
+    );
+    // TODO: Add SQL integration for favorites
   };
 
   if (!exercise) {
@@ -39,10 +75,30 @@ const ExerciseInstance = () => {
         <BackButton />
       </div>
 
-      {/* Exercise Name */}
-      <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
-        {exercise.name}
-      </h1>
+      {/* Exercise Name and Favorite Button */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+          {exercise.name}
+        </h1>
+        <button
+          onClick={handleFavoriteClick}
+          className="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all duration-200"
+          aria-label="Add to favorites"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-6 w-6 ${isFavorite ? 'text-red-500 fill-current' : 'text-gray-400 hover:text-red-500'}`}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
 
       {/* Exercise Images */}
       <div className="mb-8 relative h-[400px] w-full rounded-2xl overflow-hidden shadow-lg">
