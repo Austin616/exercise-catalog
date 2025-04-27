@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IoClose } from 'react-icons/io5';
+import { IoClose, IoSearchOutline } from 'react-icons/io5';
 
 const SearchBar = ({ 
   onSearch, 
@@ -7,7 +7,7 @@ const SearchBar = ({
   onSort,
   searchPlaceholder = "Search...",
   filterOptions = {},
-  sortOptions = []
+  sortOptions = [],
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState(
@@ -51,7 +51,7 @@ const SearchBar = ({
   return (
     <div className="w-full">
       {/* Search Input */}
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <input
           type="text"
           placeholder={searchPlaceholder}
@@ -71,52 +71,52 @@ const SearchBar = ({
       </div>
 
       {/* Filters and Sort */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Filter Dropdowns */}
-        {Object.entries(filterOptions).map(([category, options]) => (
-          <div key={category}>
-            <select
-              value={filters[category]}
-              onChange={(e) => handleFilterChange(category, e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All {category}</option>
-              {options.map((option) => (
-                <option key={option} value={option}>
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-
-        {/* Sort Dropdowns */}
-        {sortOptions.length > 0 && (
-          <>
-            <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Filter Dropdowns */}
+          {Object.entries(filterOptions).map(([category, options]) => (
+            <div key={category}>
               <select
-                value={sortBy}
-                onChange={handleSortChange}
+                value={filters[category]}
+                onChange={(e) => handleFilterChange(category, e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    Sort by {option.label}
+                <option value="all">All {category}</option>
+                {options.map((option) => (
+                  <option key={option} value={option}>
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
                   </option>
                 ))}
               </select>
             </div>
-            <div>
-              <select
-                value={sortOrder}
-                onChange={handleSortOrderChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
-            </div>
-          </>
+          ))}
+
+          {/* Sort Dropdowns */}
+          {sortOptions.length > 0 && (
+            <>
+              <div>
+                <select
+                  value={sortBy}
+                  onChange={handleSortChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      Sort by {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <select
+                  value={sortOrder}
+                  onChange={handleSortOrderChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
+            </>
         )}
       </div>
     </div>

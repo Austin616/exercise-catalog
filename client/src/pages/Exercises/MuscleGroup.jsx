@@ -180,6 +180,15 @@ const MuscleGroup = () => {
           </div>
         </div>
 
+        {/* No Results Message */}
+        {filteredExercises.length === 0 && searchTerm !== '' && (
+          <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" className="mb-4" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" /></svg>
+            <p className="text-lg font-medium">No results found</p>
+            <p className="text-sm">Try adjusting your search or filters</p>
+          </div>
+        )}
+
         {/* Exercises Grid/List */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
@@ -188,6 +197,7 @@ const MuscleGroup = () => {
                 key={exercise.id}
                 exercise={exercise}
                 viewMode={viewMode}
+                searchTerm={searchTerm}
               />
             ))}
           </div>
@@ -197,6 +207,7 @@ const MuscleGroup = () => {
               <ExerciseListItem
                 key={exercise.id}
                 exercise={exercise}
+                searchTerm={searchTerm}
               />
             ))}
           </div>
