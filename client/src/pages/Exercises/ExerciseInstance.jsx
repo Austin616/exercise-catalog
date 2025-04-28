@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import exerciseJson from "../../../../backend/dist/exercises.json";
 import BackButton from "../../components/BackButton";
@@ -7,55 +7,73 @@ import RelatedExercises from "./components/RelatedExercises";
 import ExerciseVideo from "./components/ExerciseVideo";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios'; // <-- new
 
 const ExerciseInstance = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const exercise = exerciseJson.find(ex => ex.id === id);
+
   const [activeImage, setActiveImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null); // <-- new: track DB id
+
+  useEffect(() => {
+    if (exercise) {
+      fetchFavoriteStatus();
+    }
+  }, [exercise]);
+
+  const fetchFavoriteStatus = async () => {
+    try {
+      const res = await axios.get('http://127.0.0.1:5000/api/favorites');
+      const match = res.data.find(fav => fav.exercise_id === exercise.id);
+      if (match) {
+        setIsFavorite(true);
+        setFavoriteId(match.id);
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch favorites', error);
+    }
+  };
 
   const handleMuscleClick = (muscle) => {
-    // Smooth scroll to top
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-    // Navigate to muscle page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate(`/exercises/${muscle.toLowerCase().replace(/\s+/g, '-')}`);
   };
 
-  const handleFavoriteClick = () => {
-    setIsFavorite(!isFavorite);
-    // Show toast notification
-    toast(
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-red-500"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <span>{isFavorite ? 'Removed from favorites' : 'Added to favorites'}</span>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+  const handleFavoriteClick = async () => {
+    if (!exercise) return;
+
+    if (isFavorite) {
+      // Remove from favorites
+      try {
+        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`);
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast.success('Removed from favorites!');
+      } catch (error) {
+        console.error('Failed to remove favorite', error);
+        toast.error('Failed to remove favorite');
       }
-    );
-    // TODO: Add SQL integration for favorites
+    } else {
+      // Add to favorites
+      try {
+        const res = await axios.post('http://127.0.0.1:5000/api/favorites', {
+          exercise_id: exercise.id,
+          exercise_name: exercise.name
+        });
+        setIsFavorite(true);
+        setFavoriteId(res.data.id);
+        toast.success('Added to favorites!');
+      } catch (error) {
+        console.error('Failed to add favorite', error);
+        toast.error('Failed to add favorite');
+      }
+    }
   };
 
   if (!exercise) {
@@ -180,7 +198,7 @@ const ExerciseInstance = () => {
       </div>
 
       {/* Muscles */}
-      {["Primary", "Secondary"].map((type, idx) => (
+      {["Primary", "Secondary"].map((type) => (
         <div
           key={type}
           className="mb-6"
@@ -212,4 +230,4 @@ const ExerciseInstance = () => {
   );
 };
 
-export default ExerciseInstance; 
+export default ExerciseInstance;
