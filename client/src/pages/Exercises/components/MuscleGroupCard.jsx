@@ -4,8 +4,8 @@ import exerciseJson from "../../../../../backend/dist/exercises.json";
 import muscleDescriptions from "../../../../../backend/muscleDescriptions.js";
 
 const muscleIcons = {
-  abdominals: "💪",
-  hamstrings: "🦵",
+  abdominals: "😰",
+  hamstrings: "🍖",
   adductors: "🦿",
   quadriceps: "🦵",
   biceps: "💪",
@@ -59,48 +59,46 @@ const MuscleGroupCard = ({ muscleGroup, maxMuscleGroup, searchTerm = '' }) => {
   return (
     <Link
       to={`/exercises/${muscleGroup.toLowerCase().replace(/\s/g, "-")}`}
-      className={`group bg-white rounded-xl shadow-md p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 flex flex-col justify-between active:scale-95 ${
-        isMostPopular ? 'ring-2 ring-yellow-400' : ''
-      } ${isMatch ? 'ring-2 ring-yellow-400' : ''}`}
+      className="group bg-white rounded-2xl shadow-md p-8 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 active:scale-95"
     >
       {/* Icon Badge */}
-      <div className="flex items-center justify-center mb-4">
-        <div className={`w-16 h-16 flex items-center justify-center rounded-full text-4xl group-hover:bg-blue-200 transition ${
-          isMostPopular ? 'bg-yellow-100' : isMatch ? 'bg-yellow-100' : 'bg-blue-100'
-        }`}>
-          {displayIcon}
-        </div>
+      <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-6">
+        <span className="text-4xl">{displayIcon}</span>
       </div>
 
       {/* Title */}
-      <h2 className={`text-xl font-bold mb-2 capitalize text-gray-800 group-hover:text-blue-600 transition-colors duration-300 text-center ${
-        isMostPopular || isMatch ? 'text-yellow-600' : ''
-      }`}>
+      <h2 className="text-2xl font-extrabold text-gray-900 mb-3 capitalize group-hover:text-blue-600 transition-colors duration-300">
         {highlightText(muscleGroup)}
       </h2>
 
       {/* Description */}
-      <p className="text-sm text-gray-600 mb-3 text-center">
+      <p className="text-base text-gray-500 mb-4 leading-relaxed">
         {highlightText(muscleDescriptions[key] || "Strengthen this muscle group with focused exercises.")}
       </p>
 
-      {/* Exercise Count and Badges */}
-      <div className="text-center">
-        <p className="text-xs text-gray-500 mb-1">
-          {numberOfExercises} exercises
-        </p>
+      {/* Exercise Count */}
+      <p className="text-sm text-gray-400 mb-2">
+        {numberOfExercises} exercises
+      </p>
 
-        {/* Tags */}
-        {isMostPopular ? (
-          <span className="text-xs font-semibold text-yellow-500">🏆 Most Versatile</span>
-        ) : isHighVariety ? (
-          <span className="text-xs font-semibold text-green-500">🔥 High Variety</span>
-        ) : isMidVariety ? (
-          <span className="text-xs font-semibold text-blue-500">💪 Mid Variety</span>
-        ) : isLowVariety ? (
-          <span className="text-xs font-semibold text-gray-500">⚡ Low Variety</span>
-        ) : null}
-      </div>
+      {/* Variety Badges */}
+      {isMostPopular ? (
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-yellow-500">
+          🏆 Most Versatile
+        </span>
+      ) : isHighVariety ? (
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-green-500">
+          🔥 High Variety
+        </span>
+      ) : isMidVariety ? (
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-blue-500">
+          💪 Mid Variety
+        </span>
+      ) : isLowVariety ? (
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-400">
+          ⚡ Low Variety
+        </span>
+      ) : null}
     </Link>
   );
 };

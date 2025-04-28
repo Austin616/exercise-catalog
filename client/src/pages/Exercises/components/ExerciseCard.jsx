@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { tagColors } from '../../../utils/tagColors'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import axios from 'axios';
 
 const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
 
   const highlightText = (text) => {
     if (!text || !searchTerm) return text;
@@ -21,39 +23,59 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
     );
   };
 
-  const handleFavoriteClick = (e) => {
-    e.preventDefault();
-    setIsFavorite(!isFavorite);
-    toast(
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-red-500"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <span>{isFavorite ? 'Removed from favorites' : 'Added to favorites'}</span>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+  if (!exercise) return null;
+
+  useEffect(() => {
+    if (exercise) {
+      fetchFavoriteStatus();
+    }
+  }, [exercise]);
+
+  const fetchFavoriteStatus = async () => {
+    try {
+      const res = await axios.get('http://127.0.0.1:5000/api/favorites');
+      const match = res.data.find(fav => fav.exercise_id === exercise.id);
+      if (match) {
+        setIsFavorite(true);
+        setFavoriteId(match.id);
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
       }
-    );
+    } catch (error) {
+      console.error('Failed to fetch favorites', error);
+    }
   };
 
-  if (!exercise) return null;
+  const handleFavoriteClick = async (e) => {
+    e.preventDefault();
+    if (!exercise) return;
+
+    if (isFavorite) {
+      try {
+        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`);
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast.success('Removed from favorites!');
+      } catch (error) {
+        console.error('Failed to remove favorite', error);
+        toast.error('Failed to remove favorite');
+      }
+    } else {
+      try {
+        const res = await axios.post('http://127.0.0.1:5000/api/favorites', {
+          exercise_id: exercise.id,
+          exercise_name: exercise.name
+        });
+        setIsFavorite(true);
+        setFavoriteId(res.data.id);
+        toast.success('Added to favorites!');
+      } catch (error) {
+        console.error('Failed to add favorite', error);
+        toast.error('Failed to add favorite');
+      }
+    }
+  };
 
   const isTagMatch = (value) => {
     if (!searchTerm) return false;
@@ -63,7 +85,7 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   return (
     <Link
       to={`/exercises/instance/${exercise.id}`}
-      className="group bg-white rounded-2xl shadow-lg w-full aspect-[3/4] max-w-[280px] p-6 flex flex-col justify-between items-center text-center hover:shadow-2xl transition-all duration-300 relative"
+      className="relative flex flex-col items-center p-6 bg-white rounded-3xl shadow hover:shadow-lg transition-all duration-300 w-full max-w-[300px] text-center"
     >
       {/* Favorite Button */}
       <button
@@ -86,43 +108,50 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
       </button>
 
       {/* Image in circle */}
-      <div className="bg-blue-100 p-4 rounded-full flex items-center justify-center mb-4">
+      <div className="rounded-full bg-blue-100 p-4 mb-4 flex items-center justify-center">
         <img
           src={`/exercises/${exercise.images?.[0] || 'default.jpg'}`}
           alt={exercise.name || 'Exercise'}
-          className="w-16 h-16 object-cover rounded-full"
+          className="w-24 h-24 object-cover rounded-full"
         />
       </div>
 
       {/* Exercise Name */}
-      <h2 className="text-xl font-bold text-gray-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors duration-300">
+      <h2 className="text-2xl font-extrabold text-gray-800 mb-2">
         {highlightText(exercise.name || '')}
       </h2>
 
-      {/* Short Tagline */}
-      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-        {exercise.description || 'Improve your strength and stability.'}
-      </p>
-
+      {/* Primary Muscles */}
+      <div className="mb-4">
+        {exercise.primaryMuscles?.map((muscle, index) => (
+          <span
+            key={index}
+            className="inline-block bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full"
+          >
+            {highlightText(muscle)}
+          </span>
+        ))}
+      </div>
+      
       {/* Badges */}
-      <div className="flex flex-wrap justify-center gap-2 text-xs font-medium mt-auto">
+      <div className="flex flex-wrap justify-center gap-2 text-xs mt-4">
         {exercise.force && (
-          <span className={`${tagColors.force.bg} ${tagColors.force.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.force.hover} ${isTagMatch(exercise.force) ? 'ring-2 ring-yellow-400' : ''}`}>
+          <span className={`px-3 py-1 rounded-full font-medium capitalize ${tagColors.force.bg} ${tagColors.force.text} ${tagColors.force.hover} ${isTagMatch(exercise.force) ? 'ring-2 ring-yellow-400' : ''}`}>
             {highlightText(exercise.force)}
           </span>
         )}
         {exercise.equipment && (
-          <span className={`${tagColors.equipment.bg} ${tagColors.equipment.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.equipment.hover} ${isTagMatch(exercise.equipment) ? 'ring-2 ring-yellow-400' : ''}`}>
+          <span className={`px-3 py-1 rounded-full font-medium capitalize ${tagColors.equipment.bg} ${tagColors.equipment.text} ${tagColors.equipment.hover} ${isTagMatch(exercise.equipment) ? 'ring-2 ring-yellow-400' : ''}`}>
             {highlightText(exercise.equipment)}
           </span>
         )}
         {exercise.level && (
-          <span className={`${tagColors.level.bg} ${tagColors.level.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.level.hover} ${isTagMatch(exercise.level) ? 'ring-2 ring-yellow-400' : ''}`}>
+          <span className={`px-3 py-1 rounded-full font-medium capitalize ${tagColors.level.bg} ${tagColors.level.text} ${tagColors.level.hover} ${isTagMatch(exercise.level) ? 'ring-2 ring-yellow-400' : ''}`}>
             {highlightText(exercise.level)}
           </span>
         )}
         {exercise.category && (
-          <span className={`${tagColors.category.bg} ${tagColors.category.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.category.hover} ${isTagMatch(exercise.category) ? 'ring-2 ring-yellow-400' : ''}`}>
+          <span className={`px-3 py-1 rounded-full font-medium capitalize ${tagColors.category.bg} ${tagColors.category.text} ${tagColors.category.hover} ${isTagMatch(exercise.category) ? 'ring-2 ring-yellow-400' : ''}`}>
             {highlightText(exercise.category)}
           </span>
         )}

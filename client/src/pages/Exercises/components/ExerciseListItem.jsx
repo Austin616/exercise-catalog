@@ -1,44 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { tagColors } from '../../../utils/tagColors';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const ExerciseListItem = ({ exercise }) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
 
-  const handleFavoriteClick = (e) => {
-    e.preventDefault(); // Prevent navigation when clicking the heart
-    setIsFavorite(!isFavorite);
-    // Show toast notification
-    toast(
-      <div className="flex items-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 mr-2 text-red-500"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <span>{isFavorite ? 'Removed from favorites' : 'Added to favorites'}</span>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+  useEffect(() => {
+    if (exercise) {
+      fetchFavoriteStatus();
+    }
+  }, [exercise]);
+
+  const fetchFavoriteStatus = async () => {
+    try {
+      const res = await axios.get('http://127.0.0.1:5000/api/favorites');
+      const match = res.data.find(fav => fav.exercise_id === exercise.id);
+      if (match) {
+        setIsFavorite(true);
+        setFavoriteId(match.id);
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
       }
-    );
-    // TODO: Add SQL integration for favorites
+    } catch (error) {
+      console.error('Failed to fetch favorites', error);
+    }
+  };
+
+  const handleFavoriteClick = async (e) => {
+    e.preventDefault();
+    if (!exercise) return;
+
+    if (isFavorite) {
+      try {
+        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`);
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast.success('Removed from favorites!', { autoClose: 1000 });
+      } catch (error) {
+        console.error('Failed to remove favorite', error);
+        toast.error('Failed to remove favorite', { autoClose: 1000 });
+      }
+    } else {
+      try {
+        const res = await axios.post('http://127.0.0.1:5000/api/favorites', {
+          exercise_id: exercise.id,
+          exercise_name: exercise.name
+        });
+        setIsFavorite(true);
+        setFavoriteId(res.data.id);
+        toast.success('Added to favorites!', { autoClose: 1000 });
+      } catch (error) {
+        console.error('Failed to add favorite', error);
+        toast.error('Failed to add favorite', { autoClose: 1000 });
+      }
+    }
   };
 
   return (
