@@ -7,10 +7,8 @@ import 'react-toastify/dist/ReactToastify.css'
 const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Function to highlight matching text
   const highlightText = (text) => {
     if (!text || !searchTerm) return text;
-    
     const regex = new RegExp(`(${searchTerm})`, 'gi');
     return text.split(regex).map((part, i) => 
       regex.test(part) ? (
@@ -24,9 +22,8 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   };
 
   const handleFavoriteClick = (e) => {
-    e.preventDefault(); // Prevent navigation when clicking the heart
+    e.preventDefault();
     setIsFavorite(!isFavorite);
-    // Show toast notification
     toast(
       <div className="flex items-center">
         <svg
@@ -54,12 +51,10 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
         theme: "light",
       }
     );
-    // TODO: Add SQL integration for favorites
   };
 
   if (!exercise) return null;
 
-  // Check if any tag matches the search term
   const isTagMatch = (value) => {
     if (!searchTerm) return false;
     return value?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -68,7 +63,7 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
   return (
     <Link
       to={`/exercises/instance/${exercise.id}`}
-      className="group bg-white rounded-xl shadow-lg w-full aspect-[3/4] max-w-[280px] p-5 flex flex-col justify-between items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 relative"
+      className="group bg-white rounded-2xl shadow-lg w-full aspect-[3/4] max-w-[280px] p-6 flex flex-col justify-between items-center text-center hover:shadow-2xl transition-all duration-300 relative"
     >
       {/* Favorite Button */}
       <button
@@ -89,33 +84,48 @@ const ExerciseCard = ({ exercise, searchTerm = '' }) => {
           />
         </svg>
       </button>
-      
-      {/* Image */}
-      <img
-        src={`/exercises/${exercise.images?.[0] || 'default.jpg'}`}
-        alt={exercise.name || 'Exercise'}
-        className="w-full h-[160px] object-cover rounded-lg mb-4"
-      />
 
-      {/* Name */}
-      <h2 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+      {/* Image in circle */}
+      <div className="bg-blue-100 p-4 rounded-full flex items-center justify-center mb-4">
+        <img
+          src={`/exercises/${exercise.images?.[0] || 'default.jpg'}`}
+          alt={exercise.name || 'Exercise'}
+          className="w-16 h-16 object-cover rounded-full"
+        />
+      </div>
+
+      {/* Exercise Name */}
+      <h2 className="text-xl font-bold text-gray-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors duration-300">
         {highlightText(exercise.name || '')}
       </h2>
 
-      {/* Info Badges */}
+      {/* Short Tagline */}
+      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+        {exercise.description || 'Improve your strength and stability.'}
+      </p>
+
+      {/* Badges */}
       <div className="flex flex-wrap justify-center gap-2 text-xs font-medium mt-auto">
-        <span className={`${tagColors.force.bg} ${tagColors.force.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.force.hover} ${isTagMatch(exercise.force) ? 'ring-2 ring-yellow-400' : ''}`}>
-          {highlightText(exercise.force || '')}
-        </span>
-        <span className={`${tagColors.equipment.bg} ${tagColors.equipment.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.equipment.hover} ${isTagMatch(exercise.equipment) ? 'ring-2 ring-yellow-400' : ''}`}>
-          {highlightText(exercise.equipment || 'No equipment required')}
-        </span>
-        <span className={`${tagColors.level.bg} ${tagColors.level.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.level.hover} ${isTagMatch(exercise.level) ? 'ring-2 ring-yellow-400' : ''}`}>
-          {highlightText(exercise.level || '')}
-        </span>
-        <span className={`${tagColors.category.bg} ${tagColors.category.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.category.hover} ${isTagMatch(exercise.category) ? 'ring-2 ring-yellow-400' : ''}`}>
-          {highlightText(exercise.category || '')}
-        </span>
+        {exercise.force && (
+          <span className={`${tagColors.force.bg} ${tagColors.force.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.force.hover} ${isTagMatch(exercise.force) ? 'ring-2 ring-yellow-400' : ''}`}>
+            {highlightText(exercise.force)}
+          </span>
+        )}
+        {exercise.equipment && (
+          <span className={`${tagColors.equipment.bg} ${tagColors.equipment.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.equipment.hover} ${isTagMatch(exercise.equipment) ? 'ring-2 ring-yellow-400' : ''}`}>
+            {highlightText(exercise.equipment)}
+          </span>
+        )}
+        {exercise.level && (
+          <span className={`${tagColors.level.bg} ${tagColors.level.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.level.hover} ${isTagMatch(exercise.level) ? 'ring-2 ring-yellow-400' : ''}`}>
+            {highlightText(exercise.level)}
+          </span>
+        )}
+        {exercise.category && (
+          <span className={`${tagColors.category.bg} ${tagColors.category.text} px-3 py-1 rounded-full capitalize transition group-hover:scale-105 ${tagColors.category.hover} ${isTagMatch(exercise.category) ? 'ring-2 ring-yellow-400' : ''}`}>
+            {highlightText(exercise.category)}
+          </span>
+        )}
       </div>
     </Link>
   )
