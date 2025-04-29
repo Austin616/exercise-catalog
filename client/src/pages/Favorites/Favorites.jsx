@@ -235,6 +235,17 @@ const Favorites = () => {
           </div>
         )}
 
+        {/* Explore more */}
+        <div className="mt-8 text-center">
+          <p className="text-lg font-medium text-gray-700">Want to explore more exercises?</p>
+          <p className="text-sm text-gray-500">Browse our full exercise library.</p>
+          <button
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+            onClick={() => window.location.href = '/exercises'}
+          >
+            Browse Exercises
+          </button>
+        </div>
         {/* Pagination */}
         {filteredFavorites.length > 0 && (
           <div className="mt-8">
