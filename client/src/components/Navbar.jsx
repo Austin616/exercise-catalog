@@ -9,6 +9,7 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   const handleNavClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -51,6 +52,25 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/current_user', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user', error);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+
     const handleScroll = () => {
       // Only hide during hero section on home page
       if (location.pathname === '/') {
@@ -69,6 +89,17 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location.pathname]);
+
+  const handleLogin = () => {
+    window.location.href = 'http://127.0.0.1:5000/api/auth/login';
+  };
+
+  const handleLogout = () => {
+    const confirmed = window.confirm('Are you sure you want to log out?');
+    if (confirmed) {
+      window.location.href = 'http://127.0.0.1:5000/api/auth/logout';
+    }
+  };
 
   return (
     <div 
@@ -137,13 +168,23 @@ const Navbar = () => {
         </Link>
 
         {/* Profile Button */}
-        <Link
-          to="/profile"
-          className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2"
-          onClick={handleNavClick}
-        >
-          <FaUser className="text-white" size={25} />
-        </Link>
+        {user ? (
+          <button
+            onClick={handleLogout}
+            className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2"
+          >
+            <FaUser className="text-white" size={25} />
+            <span className="ml-2">Logout</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleLogin}
+            className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2"
+          >
+            <FaUser className="text-white" size={25} />
+            <span className="ml-2">Login</span>
+          </button>
+        )}
       </div>
 
       {/* Hamburger Button (Mobile Only) */}
@@ -205,14 +246,23 @@ const Navbar = () => {
             <FaHeart className={`${location.pathname === '/favorites' ? 'text-red-500' : 'text-white'} hover:text-red-500 transition-colors duration-300`} size={15} />
             <span className="ml-2">Favorites</span>
           </Link>
-          <Link
-            to="/profile"
-            className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4"
-            onClick={handleNavClick}
-          >
-            <FaUser className="text-white" size={15} />
-            <span className="ml-2">Profile</span>
-          </Link>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4"
+            >
+              <FaUser className="text-white" size={15} />
+              <span className="ml-2">Logout</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleLogin}
+              className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4"
+            >
+              <FaUser className="text-white" size={15} />
+              <span className="ml-2">Login</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import ExerciseCard from '../Exercises/components/ExerciseCard';
 import ExerciseListItem from '../Exercises/components/ExerciseListItem';
 import ViewControls from '../../components/ViewControls';
@@ -11,6 +12,7 @@ const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notLoggedIn, setNotLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
 
@@ -27,17 +29,27 @@ const Favorites = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/favorites');
-        if (!response.ok) {
-          throw new Error('Failed to fetch favorites');
+        const userRes = await axios.get('http://127.0.0.1:5000/api/current_user', { withCredentials: true });
+        if (userRes.data) {
+          const response = await axios.get('http://127.0.0.1:5000/api/favorites', { withCredentials: true });
+          const data = response.data;
+          const favoriteExercises = data
+            .map(fav =>
+              exerciseJson.find(ex => ex.id === fav.exercise_id)
+            )
+            .filter(Boolean);
+          setFavorites(favoriteExercises);
+        } else {
+          setNotLoggedIn(true);
         }
-        const data = await response.json();
-        const favoriteExercises = data.map(fav => 
-          exerciseJson.find(ex => ex.id === fav.exercise_id)
-        ).filter(Boolean);
-        setFavorites(favoriteExercises);
       } catch (err) {
-        setError(err.message);
+        if (err.response && err.response.status === 401) {
+          setFavorites([]);
+          setNotLoggedIn(true);
+        } else {
+          console.error('Failed to fetch favorites', err);
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -148,6 +160,24 @@ const Favorites = () => {
     );
   }
 
+  if (notLoggedIn) {
+    return (
+      <div className="px-4 py-8">
+        <div className="text-center text-gray-600">
+          <p className="text-lg font-medium">Please log in to view your favorite exercises.</p>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+            onClick={() => window.location.href = 'http://127.0.0.1:5000/api/auth/login'}
+          >
+            Log In
+          </button>
+          </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="px-4 py-8">
@@ -241,7 +271,7 @@ const Favorites = () => {
           <p className="text-sm text-gray-500">Browse our full exercise library.</p>
           <button
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
-            onClick={() => window.location.href = '/exercises'}
+            onClick={() => window.location.href = '/search'}
           >
             Browse Exercises
           </button>

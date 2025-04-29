@@ -17,7 +17,7 @@ const ExerciseListItem = ({ exercise }) => {
 
   const fetchFavoriteStatus = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/favorites');
+      const res = await axios.get('http://127.0.0.1:5000/api/favorites', { withCredentials: true });
       const match = res.data.find(fav => fav.exercise_id === exercise.id);
       if (match) {
         setIsFavorite(true);
@@ -27,7 +27,12 @@ const ExerciseListItem = ({ exercise }) => {
         setFavoriteId(null);
       }
     } catch (error) {
-      console.error('Failed to fetch favorites', error);
+      if (error.response && error.response.status === 401) {
+        setIsFavorite(false);
+        setFavoriteId(null);
+      } else {
+        console.error('Failed to fetch favorites', error);
+      }
     }
   };
 
@@ -37,26 +42,34 @@ const ExerciseListItem = ({ exercise }) => {
 
     if (isFavorite) {
       try {
-        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`);
+        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`, { withCredentials: true });
         setIsFavorite(false);
         setFavoriteId(null);
         toast.success('Removed from favorites!', { autoClose: 1000 });
       } catch (error) {
         console.error('Failed to remove favorite', error);
-        toast.error('Failed to remove favorite', { autoClose: 1000 });
+        if (error.response && error.response.status === 401) {
+          toast.error('You must be logged in to remove favorites', { autoClose: 1000 });
+        } else {
+          toast.error('Failed to remove favorite', { autoClose: 1000 });
+        }
       }
     } else {
       try {
         const res = await axios.post('http://127.0.0.1:5000/api/favorites', {
           exercise_id: exercise.id,
           exercise_name: exercise.name
-        });
+        }, { withCredentials: true });
         setIsFavorite(true);
         setFavoriteId(res.data.id);
         toast.success('Added to favorites!', { autoClose: 1000 });
       } catch (error) {
         console.error('Failed to add favorite', error);
-        toast.error('Failed to add favorite', { autoClose: 1000 });
+        if (error.response && error.response.status === 401) {
+          toast.error('You must be logged in to add favorites', { autoClose: 1000 });
+        } else {
+          toast.error('Failed to add favorite', { autoClose: 1000 });
+        }
       }
     }
   };
