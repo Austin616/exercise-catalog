@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaBars, FaSearch, FaHeart } from 'react-icons/fa';
+import { Link, useLocation } from 'react-router-dom';
+import { FaBars, FaHeart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   const handleNavClick = () => {
@@ -40,15 +38,6 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   };
 
   useEffect(() => {
@@ -132,32 +121,15 @@ const Navbar = () => {
         <Link to="/search" className={getLinkClass("/search")} onClick={handleNavClick}>
           Browse
         </Link>
+        <Link to="/create" className={getLinkClass("/create")} onClick={handleNavClick}>
+          Create
+        </Link>
         <Link to="/about" className={getLinkClass("/about")} onClick={handleNavClick}>
           About
         </Link>
       </div>
 
-      {/* Right side (Search Bar + Icons) */}
       <div className="hidden md:flex items-center space-x-4 ml-auto">
-        {/* Search Bar */}
-        <div className="flex items-center bg-gray-700 rounded-lg overflow-hidden">
-          <form onSubmit={handleSearch} className="flex items-center">
-            <input
-              type="text"
-              placeholder="Search exercises..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-2 py-2 bg-transparent text-white focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="p-4 bg-gray-600 hover:bg-gray-500 transition duration-300 cursor-pointer"
-            >
-              <FaSearch className="text-white" />
-            </button>
-          </form>
-        </div>
-
         {/* Favorites Button */}
         <Link
           to="/favorites"

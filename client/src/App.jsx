@@ -11,6 +11,7 @@ import About from './pages/About/About'
 import Search from './pages/Search/Search'
 import MuscleGroup from './pages/Exercises/MuscleGroup'
 import ExerciseInstance from './pages/Exercises/ExerciseInstance'
+import Create from './pages/Create/Create'
 import Favorites from './pages/Favorites/Favorites'
 import Layout from './Layout'
 import NotFound from './pages/NotFound'
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/about" element={<Layout><About /></Layout>} />
             <Route path="/search" element={<Layout><Search /></Layout>} />
             <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
+            <Route path="/create" element={<Layout><Create /></Layout>} />
             <Route path="*" element={<Layout><NotFound/></Layout>} />
             <Route path="/exercises/:id" element={<Layout><MuscleGroup/></Layout>} />
             <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} /> 
