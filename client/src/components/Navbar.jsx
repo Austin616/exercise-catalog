@@ -193,18 +193,25 @@ const Navbar = () => {
           Categories
         </Link>
         <Link
-          to="/about"
-          className={getLinkClass("/about")}
-          onClick={handleNavClick}
-        >
-          About
-        </Link>
-        <Link
           to="/search"
           className={getLinkClass("/search")}
           onClick={handleNavClick}
         >
           Browse
+        </Link>
+        <Link
+          to="/create"
+          className={getLinkClass("/create")}
+          onClick={handleNavClick}
+        >
+          Create
+        </Link>
+        <Link
+          to="/about"
+          className={getLinkClass("/about")}
+          onClick={handleNavClick}
+        >
+          About
         </Link>
 
         {/* Mobile Icons */}

@@ -69,8 +69,8 @@ const WorkoutCard = () => {
           </button>
         </div>
 
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-7 gap-6 w-full">
+        <div className="w-full max-w-7xl mx-auto overflow-x-auto">
+          <div className="min-w-[700px] sm:grid sm:grid-cols-7 gap-6 flex sm:flex-none flex-nowrap">
             {daysOfWeek.map((date) => {
               const workoutsForDate = getWorkoutsForDate(date);
               return (
