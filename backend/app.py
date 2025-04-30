@@ -17,6 +17,8 @@ CORS(app, supports_credentials=True)
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
+search_cache = {}
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -126,6 +128,9 @@ def youtube_search():
     if not query:
         return jsonify({'error': 'Query parameter is required'}), 400
 
+    if query in search_cache:
+        return jsonify(search_cache[query])
+
     if not YOUTUBE_API_KEY:
         return jsonify({'error': 'YouTube API key is not configured'}), 500
 
@@ -150,7 +155,9 @@ def youtube_search():
             return jsonify({'error': 'No videos found'}), 404
 
         video_id = data['items'][0]['id']['videoId']
-        return jsonify({'videoId': video_id})
+        result = {'videoId': video_id}
+        search_cache[query] = result
+        return jsonify(result)
     except Exception as e:
         print(e)
         return jsonify({'error': 'Failed to fetch YouTube data'}), 500
