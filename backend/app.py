@@ -6,7 +6,6 @@ import os
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from authlib.integrations.flask_client import OAuth
-from werkzeug.security import generate_password_hash, check_password_hash
 
 # Load environment variables from .env file
 load_dotenv()
@@ -62,31 +61,31 @@ class Favorite(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Initialize the database only if schema is outdated (missing user_id in Favorite)
-import sqlite3
+# # Initialize the database only if schema is outdated (missing user_id in Favorite)
+# import sqlite3
 
-def check_and_reset_db():
-    db_path = 'favorites.db'
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+# def check_and_reset_db():
+#     db_path = 'favorites.db'
+#     conn = sqlite3.connect(db_path)
+#     cursor = conn.cursor()
 
-    # Check if 'user_id' exists in 'favorite' table
-    try:
-        cursor.execute("PRAGMA table_info(favorite);")
-        columns = [col[1] for col in cursor.fetchall()]
-        if 'user_id' not in columns:
-            print("Missing 'user_id' column. Dropping and recreating all tables.")
-            db.drop_all()
-            db.create_all()
-        else:
-            print("'user_id' column exists. No reset needed.")
-    except Exception as e:
-        print("Error checking DB schema:", e)
-    finally:
-        conn.close()
+#     # Check if 'user_id' exists in 'favorite' table
+#     try:
+#         cursor.execute("PRAGMA table_info(favorite);")
+#         columns = [col[1] for col in cursor.fetchall()]
+#         if 'user_id' not in columns:
+#             print("Missing 'user_id' column. Dropping and recreating all tables.")
+#             db.drop_all()
+#             db.create_all()
+#         else:
+#             print("'user_id' column exists. No reset needed.")
+#     except Exception as e:
+#         print("Error checking DB schema:", e)
+#     finally:
+#         conn.close()
 
-with app.app_context():
-    check_and_reset_db()
+# with app.app_context():
+#     check_and_reset_db()
 
 # Get YouTube API key from environment
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
