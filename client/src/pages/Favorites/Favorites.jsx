@@ -29,9 +29,9 @@ const Favorites = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const userRes = await axios.get('http://127.0.0.1:5000/api/current_user', { withCredentials: true });
+        const userRes = await axios.get('https://exercise-catalog.onrender.com/api/current_user', { withCredentials: true });
         if (userRes.data) {
-          const response = await axios.get('http://127.0.0.1:5000/api/favorites', { withCredentials: true });
+          const response = await axios.get('https://exercise-catalog.onrender.com/api/favorites', { withCredentials: true });
           const data = response.data;
           const favoriteExercises = data
             .map(fav =>
@@ -166,7 +166,7 @@ const Favorites = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Please Log In</h2>
         <p className="text-gray-600 mb-6">You must be logged in to view your favorite exercises.</p>
         <a
-          href="http://127.0.0.1:5000/api/auth/login"
+          href="https://exercise-catalog.onrender.com/api/auth/login"
           className="inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition"
         >
           Log In

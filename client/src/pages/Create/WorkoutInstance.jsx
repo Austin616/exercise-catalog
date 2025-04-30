@@ -19,7 +19,7 @@ const WorkoutInstance = () => {
   useEffect(() => {
     const fetchWorkout = async () => {
       try {
-        const res = await axios.get(`http://127.0.0.1:5000/api/workouts/${id}`, { withCredentials: true });
+        const res = await axios.get(`https://exercise-catalog.onrender.com/api/workouts/${id}`, { withCredentials: true });
         setWorkout(res.data);
 
         // After the workout is fetched and loaded, calculate the max weight for each exercise

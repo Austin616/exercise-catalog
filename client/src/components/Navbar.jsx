@@ -49,7 +49,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/current_user', {
+        const response = await fetch('https://exercise-catalog.onrender.com/api/current_user', {
           credentials: 'include',
         });
         if (response.ok) {
@@ -86,7 +86,7 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const handleLogin = () => {
-    window.location.href = 'http://127.0.0.1:5000/api/auth/login';
+    window.location.href = 'https://exercise-catalog.onrender.com/api/auth/login';
   };
 
   return (
@@ -266,7 +266,7 @@ const Navbar = () => {
       variant="contained"
       color="error"
       onClick={() => {
-        window.location.href = 'http://127.0.0.1:5000/api/auth/logout';
+        window.location.href = 'https://exercise-catalog.onrender.com/api/auth/logout';
       }}
     >
       Log Out

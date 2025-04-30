@@ -14,7 +14,7 @@ const WorkoutCard = () => {
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:5000/api/workouts', { withCredentials: true });
+        const res = await axios.get('https://exercise-catalog.onrender.com/api/workouts', { withCredentials: true });
   
         if (Array.isArray(res.data)) {
           setWorkouts(res.data);

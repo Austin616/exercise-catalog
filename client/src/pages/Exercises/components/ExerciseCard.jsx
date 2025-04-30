@@ -33,7 +33,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
 
   const fetchFavoriteStatus = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:5000/api/favorites", {
+      const res = await axios.get("https://exercise-catalog.onrender.com/api/favorites", {
         withCredentials: true,
       });
       const match = res.data.find((fav) => fav.exercise_id === exercise.id);

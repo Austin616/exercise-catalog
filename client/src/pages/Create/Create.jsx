@@ -9,11 +9,12 @@ const Create = () => {
   const [showForm, setShowForm] = useState(false);
   const [recentWorkouts, setRecentWorkouts] = useState([]);
   const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
     const fetchRecentWorkouts = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:5000/api/workouts', { withCredentials: true });
+        const res = await axios.get('https://exercise-catalog.onrender.com/api/workouts', { withCredentials: true });
         if (Array.isArray(res.data)) {
           const sorted = res.data
             .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -28,14 +29,24 @@ const Create = () => {
 
     const fetchUser = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:5000/api/current_user', { withCredentials: true });
+        const res = await axios.get('https://exercise-catalog.onrender.com/api/current_user', { withCredentials: true });
         setUser(res.data);
       } catch (err) {
         setUser(null);
+      } finally {
+        setLoadingUser(false);
       }
     };
     fetchUser();
   }, []);
+
+  if (loadingUser) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-gray-500 text-sm animate-pulse">Checking login status...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -43,7 +54,7 @@ const Create = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Please Log In</h2>
         <p className="text-gray-600 mb-6">You must be logged in to create and log workouts.</p>
         <a
-          href="http://127.0.0.1:5000/api/auth/login"
+          href="https://exercise-catalog.onrender.com/api/auth/login"
           className="inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition"
         >
           Log In

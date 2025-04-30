@@ -21,7 +21,7 @@ const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, 
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:5000/api/favorites', { withCredentials: true });
+        const res = await axios.get('https://exercise-catalog.onrender.com/api/favorites', { withCredentials: true });
         setFavoriteExercises(res.data.map(fav => fav.exercise_name));
       } catch (error) {
         console.error('Failed to fetch favorites', error);

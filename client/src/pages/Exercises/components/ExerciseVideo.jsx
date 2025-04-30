@@ -9,7 +9,7 @@ const ExerciseVideo = ({ exerciseName }) => {
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/api/youtube/search?query=${exerciseName}`);
+        const response = await axios.get(`https://exercise-catalog.onrender.com/api/youtube/search?query=${exerciseName}`);
         setVideoId(response.data.videoId);
       } catch (err) {
         console.error(err);

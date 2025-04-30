@@ -31,7 +31,7 @@ const ExerciseInstance = () => {
 
   const fetchFavoriteStatus = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/favorites', { withCredentials: true });
+      const res = await axios.get('https://exercise-catalog.onrender.com/api/favorites', { withCredentials: true });
       const match = res.data.find(fav => fav.exercise_id === exercise.id);
       if (match) {
         setIsFavorite(true);
@@ -52,7 +52,7 @@ const ExerciseInstance = () => {
   const fetchExerciseHistory = async () => {
     try {
       const exerciseId = (exerciseJson.find(e => e.name === exercise.name)?.id) || encodeURIComponent(exercise.name);
-      const res = await axios.get(`http://127.0.0.1:5000/api/exercise_history/${exerciseId}`, {
+      const res = await axios.get(`https://exercise-catalog.onrender.com/api/exercise_history/${exerciseId}`, {
         withCredentials: true
       });
       console.log('res.data', res.data);
@@ -73,7 +73,7 @@ const ExerciseInstance = () => {
     if (isFavorite) {
       // Remove from favorites
       try {
-        await axios.delete(`http://127.0.0.1:5000/api/favorites/${favoriteId}`, { withCredentials: true });
+        await axios.delete(`https://exercise-catalog.onrender.com/api/favorites/${favoriteId}`, { withCredentials: true });
         setIsFavorite(false);
         setFavoriteId(null);
         toast.success('Removed from favorites!');
@@ -88,7 +88,7 @@ const ExerciseInstance = () => {
     } else {
       // Add to favorites
       try {
-        const res = await axios.post('http://127.0.0.1:5000/api/favorites', {
+        const res = await axios.post('https://exercise-catalog.onrender.com/api/favorites', {
           exercise_id: exercise.id,
           exercise_name: exercise.name
         }, { withCredentials: true });
