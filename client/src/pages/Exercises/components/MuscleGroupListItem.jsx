@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import muscleDescriptions from '../../../../../backend/muscleDescriptions.js';
+import muscleDescriptions from '../../../utils/muscleDescriptions.js';
 
 const muscleIcons = {
   abdominals: "💪",
@@ -26,7 +26,7 @@ const MuscleGroupListItem = ({ muscleGroup, count, isMostPopular }) => {
   return (
     <Link
       to={`/exercises/${muscleGroup.toLowerCase().replace(/\s/g, "-")}`}
-      className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+      className="block bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 active:scale-95"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">

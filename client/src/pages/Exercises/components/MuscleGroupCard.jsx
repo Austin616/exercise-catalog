@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import exerciseJson from "../../../../../backend/dist/exercises.json";
-import muscleDescriptions from "../../../../../backend/muscleDescriptions.js";
+import muscleDescriptions from "../../../utils/muscleDescriptions.js";
 
 const muscleIcons = {
   abdominals: "😰",
