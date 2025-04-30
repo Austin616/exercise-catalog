@@ -196,7 +196,7 @@ def authorize():
             db.session.commit()
 
         login_user(user)
-        return redirect('http://localhost:5173/')
+        return redirect('https://exercise-catalog.vercel.app/')
     except Exception as e:
         print("Error during OAuth callback:", str(e))
         return jsonify({'error': str(e)}), 500
@@ -205,7 +205,7 @@ def authorize():
 @login_required
 def logout():
     logout_user()
-    return redirect('http://localhost:5173/')
+    return redirect('https://exercise-catalog.vercel.app/')
 
 # API to add a favorite
 @app.route('/api/favorites', methods=['POST'])
