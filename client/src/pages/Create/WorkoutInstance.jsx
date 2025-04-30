@@ -32,7 +32,7 @@ const WorkoutInstance = () => {
 
             const exerciseId = (exerciseJson.find(e => e.name === exercise.name)?.id) || exercise.name;
             axios.post(
-              `http://127.0.0.1:5000/api/exercise_history/${encodeURIComponent(exerciseId)}`,
+              `https://exercise-catalog.onrender.com/api/exercise_history/${encodeURIComponent(exerciseId)}`,
               {
                 sets: setData,
                 date: res.data.date
@@ -47,7 +47,7 @@ const WorkoutInstance = () => {
         }
 
         const completedRes = await axios.get(
-          `http://127.0.0.1:5000/api/workouts/${id}/completed_sets`,
+          `https://exercise-catalog.onrender.com/api/workouts/${id}/completed_sets`,
           { withCredentials: true }
         );
         setCompletedSets(completedRes.data.completedSets || {});
@@ -78,7 +78,7 @@ const WorkoutInstance = () => {
     const saveCompletedSets = async () => {
       try {
         await axios.post(
-          `http://127.0.0.1:5000/api/workouts/${workout.id}/completed_sets`,
+          `https://exercise-catalog.onrender.com/api/workouts/${workout.id}/completed_sets`,
           { completedSets },
           { withCredentials: true }
         );
