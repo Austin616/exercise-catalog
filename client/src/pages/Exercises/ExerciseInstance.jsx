@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useParams, Link, useNavigate } from "react-router-dom";
 import exerciseJson from "../../../../backend/dist/exercises.json";
 import BackButton from "../../components/BackButton";
@@ -17,10 +18,12 @@ const ExerciseInstance = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null); // <-- new: track DB id
+  const [exerciseHistory, setExerciseHistory] = useState([]);
 
   useEffect(() => {
     if (exercise) {
       fetchFavoriteStatus();
+      fetchExerciseHistory();
     }
   }, [exercise]);
 
@@ -41,6 +44,17 @@ const ExerciseInstance = () => {
       } else {
         console.error('Failed to fetch favorites', error);
       }
+    }
+  };
+
+  const fetchExerciseHistory = async () => {
+    try {
+      const res = await axios.get(`http://127.0.0.1:5000/api/exercise_history/${encodeURIComponent(exercise.name)}`, {
+        withCredentials: true
+      });
+      setExerciseHistory(res.data);
+    } catch (err) {
+      console.error("Failed to fetch exercise history", err);
     }
   };
 
@@ -235,6 +249,33 @@ const ExerciseInstance = () => {
           </div>
         </div>
       ))}
+
+      {/* Progress Over Time Chart */}
+      {exerciseHistory.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+            Progress Over Time
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={Object.values(
+              exerciseHistory.reduce((acc, entry) => {
+                const dateKey = entry.date.split('T')[0];
+                const maxWeight = Math.max(...entry.sets.map(set => parseInt(set.weight) || 0));
+                if (!acc[dateKey] || acc[dateKey].max < maxWeight) {
+                  acc[dateKey] = { date: dateKey, max: maxWeight };
+                }
+                return acc;
+              }, {})
+            )}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="max" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Related Exercises */}
       <RelatedExercises currentExercise={exercise} />

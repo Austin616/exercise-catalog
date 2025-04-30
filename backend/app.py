@@ -141,6 +141,10 @@ def youtube_search():
             }
         )
         data = response.json()
+        print(json.dumps(data, indent=2))
+
+        if "error" in data:
+            return jsonify({'error': data['error']}), 500
 
         if 'items' not in data or not data['items']:
             return jsonify({'error': 'No videos found'}), 404
@@ -326,6 +330,88 @@ def current_user_info():
             'email': None
         }), 401
     
+
+class CompletedSet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    workout_id = db.Column(db.String(36), db.ForeignKey('workout.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    completed_sets = db.Column(JsonEncodedList)
+
+@app.route('/api/workouts/<string:id>/completed_sets', methods=['GET', 'POST'])
+@login_required
+def handle_completed_sets(id):
+    if request.method == 'GET':
+        entry = CompletedSet.query.filter_by(workout_id=id, user_id=current_user.id).first()
+        return jsonify({'completedSets': entry.completed_sets if entry else {}})
+    else:
+        try:
+            data = request.get_json()
+            print("Received completedSets payload:", data)  # Debug print
+            completed = data.get('completedSets', {})
+
+            if not isinstance(completed, dict):
+                raise ValueError("Invalid data format: completedSets must be a dictionary")
+
+            entry = CompletedSet.query.filter_by(workout_id=id, user_id=current_user.id).first()
+            if entry:
+                entry.completed_sets = completed
+            else:
+                entry = CompletedSet(workout_id=id, user_id=current_user.id, completed_sets=completed)
+                db.session.add(entry)
+            db.session.commit()
+            return jsonify({'message': 'Completed sets saved'})
+        except Exception as e:
+            print("🔥 Error saving completed sets:", str(e))
+            return jsonify({'error': 'Server error', 'message': str(e)}), 500
+
+class ExerciseHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    exercise = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    sets = db.Column(JsonEncodedList, nullable=False)
+
+@app.route('/api/exercise_history', methods=['POST'])
+@login_required
+def post_exercise_history():
+    try:
+        data = request.get_json()
+        exercise = data.get('exercise')
+        sets = data.get('sets', [])
+        date = data.get('date')
+
+        if not exercise or not sets or not date:
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        history = ExerciseHistory(
+            user_id=current_user.id,
+            exercise=exercise,
+            date=date,
+            sets=sets
+        )
+        db.session.add(history)
+        db.session.commit()
+        return jsonify({'message': 'History saved'}), 201
+    except Exception as e:
+        print("🔥 Error posting exercise history:", str(e))
+        return jsonify({'error': 'Server error', 'message': str(e)}), 500
+
+@app.route('/api/exercise_history/<string:exercise>', methods=['GET'])
+@login_required
+def get_exercise_history(exercise):
+    try:
+        entries = ExerciseHistory.query.filter_by(user_id=current_user.id, exercise=exercise).all()
+        return jsonify([
+            {
+                'exercise': entry.exercise,
+                'date': entry.date,
+                'sets': entry.sets
+            } for entry in entries
+        ])
+    except Exception as e:
+        print("🔥 Error fetching exercise history:", str(e))
+        return jsonify({'error': 'Server error', 'message': str(e)}), 500
+
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)

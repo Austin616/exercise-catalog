@@ -17,3 +17,4 @@ SQLAlchemy==2.0.40
 typing_extensions==4.13.2
 urllib3==1.26.20
 Werkzeug==2.0.1
+AuthLib==1.5.2

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
 import exerciseJson from '../../../../backend/dist/exercises.json'
 import MuscleGroupCard from './components/MuscleGroupCard'
 import MuscleGroupListItem from './components/MuscleGroupListItem'

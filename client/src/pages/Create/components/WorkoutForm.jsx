@@ -62,23 +62,42 @@ const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, 
     setExercisesInWorkout(updated);
   };
 
+  const removeSet = (exerciseIdx, setIdx) => {
+    const updated = [...exercisesInWorkout];
+    updated[exerciseIdx].sets.splice(setIdx, 1);
+    setExercisesInWorkout(updated);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (exercisesInWorkout.length === 0) {
       toast.error('Please add at least one exercise to the workout.');
       return;
     }
-    // Additional validation: at least one exercise with name and one set with reps and weight
-    const hasValidExercise = exercisesInWorkout.some(ex =>
-      ex.name &&
-      ex.sets &&
-      ex.sets.some(set => set.reps && set.weight)
-    );
-    if (!hasValidExercise) {
-      toast.error('Please fill out at least one set with reps and weight.');
-      return;
+    for (const ex of exercisesInWorkout) {
+      if (!ex.name) {
+        toast.error('Please make sure each exercise has a name.');
+        return;
+      }
+
+      for (const set of ex.sets) {
+        if (!set.reps || !set.weight) {
+          toast.error('All sets must have both reps and weight filled.');
+          return;
+        }
+      }
     }
     try {
+      // Delete old exercise history entries if editing an existing workout
+      if (workoutId) {
+        try {
+          await axios.delete(`http://127.0.0.1:5000/api/exercise_history/workout/${workoutId}`, {
+            withCredentials: true,
+          });
+        } catch (error) {
+          console.error('Failed to delete old exercise history:', error);
+        }
+      }
       const payload = {
         name: workoutName,
         date: date.toISOString(),
@@ -221,7 +240,7 @@ return (
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-center gap-4 mb-2"
+                  className="group flex items-center gap-4 mb-3 p-3 bg-white border border-gray-300 rounded-lg shadow-sm relative"
                 >
                   <input
                     type="number"
@@ -239,6 +258,16 @@ return (
                     onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
                     className="w-1/2 border rounded px-2 py-1"
                   />
+                  {exercise.sets.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSet(exIdx, setIdx)}
+                      className="absolute -right-5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove Set"
+                    >
+                      <FaTrashAlt className=" w-4 h-4" />
+                    </button>
+                  )}
                 </motion.div>
               ))}
               <button
@@ -286,7 +315,16 @@ return (
               <button
                 type="button"
                 className="text-sm text-gray-500 underline hover:text-gray-700"
-                onClick={onCancel}
+                onClick={() => {
+                  const hasEmptyFields = exercisesInWorkout.some(ex =>
+                    !ex.name || ex.sets.some(set => !set.reps || !set.weight)
+                  );
+                  if (hasEmptyFields) {
+                    toast.error('Please fill out all reps and weights before canceling.');
+                    return;
+                  }
+                  onCancel();
+                }}
               >
                 Cancel
               </button>
