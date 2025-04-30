@@ -9,6 +9,7 @@ import ExerciseVideo from "./components/ExerciseVideo";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'; // <-- new
+import { subDays, subMonths, isAfter } from 'date-fns';
 
 const ExerciseInstance = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const ExerciseInstance = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null); // <-- new: track DB id
   const [exerciseHistory, setExerciseHistory] = useState([]);
+  const [viewRange, setViewRange] = useState("month");
 
   useEffect(() => {
     if (exercise) {
@@ -49,9 +51,11 @@ const ExerciseInstance = () => {
 
   const fetchExerciseHistory = async () => {
     try {
-      const res = await axios.get(`http://127.0.0.1:5000/api/exercise_history/${encodeURIComponent(exercise.name)}`, {
+      const exerciseId = (exerciseJson.find(e => e.name === exercise.name)?.id) || encodeURIComponent(exercise.name);
+      const res = await axios.get(`http://127.0.0.1:5000/api/exercise_history/${exerciseId}`, {
         withCredentials: true
       });
+      console.log('res.data', res.data);
       setExerciseHistory(res.data);
     } catch (err) {
       console.error("Failed to fetch exercise history", err);
@@ -111,6 +115,24 @@ const ExerciseInstance = () => {
       </div>
     );
   }
+
+  const filteredHistory = Object.values(
+    exerciseHistory.reduce((acc, entry) => {
+      const dateKey = entry.date.split('T')[0];
+      const maxWeight = Math.max(...entry.sets.map(set => parseInt(set.weight) || 0));
+      if (!acc[dateKey] || acc[dateKey].max < maxWeight) {
+        acc[dateKey] = { date: dateKey, max: maxWeight };
+      }
+      return acc;
+    }, {})
+  ).filter((entry) => {
+    const date = new Date(entry.date);
+    const now = new Date();
+    if (viewRange === "week") return isAfter(date, subDays(now, 7));
+    if (viewRange === "month") return isAfter(date, subMonths(now, 1));
+    if (viewRange === "6months") return isAfter(date, subMonths(now, 6));
+    return true;
+  }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="min-h-screen p-8 max-w-5xl mx-auto">
@@ -250,32 +272,53 @@ const ExerciseInstance = () => {
         </div>
       ))}
 
-      {/* Progress Over Time Chart */}
-      {exerciseHistory.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
-            Progress Over Time
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={Object.values(
-              exerciseHistory.reduce((acc, entry) => {
-                const dateKey = entry.date.split('T')[0];
-                const maxWeight = Math.max(...entry.sets.map(set => parseInt(set.weight) || 0));
-                if (!acc[dateKey] || acc[dateKey].max < maxWeight) {
-                  acc[dateKey] = { date: dateKey, max: maxWeight };
-                }
-                return acc;
-              }, {})
-            )}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="max" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
+            {/* Progress Over Time Chart */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-purple-500 text-transparent bg-clip-text">
+          Progress Over Time
+        </h2>
+        {exerciseHistory.length === 0 && (
+          <p className="text-sm text-gray-500 mb-4">
+            Start a workout to track progress.
+          </p>
+        )}
+        <div className="flex items-center gap-4 mb-4">
+          <label className="font-medium text-gray-600">View:</label>
+          <select
+            className="border border-gray-300 rounded px-2 py-1 text-sm"
+            value={viewRange}
+            onChange={(e) => setViewRange(e.target.value)}
+          >
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="6months">6 Months</option>
+          </select>
         </div>
-      )}
+        <div className="overflow-x-auto pb-2">
+          <div style={{ minWidth: `${Math.max(filteredHistory.length * 80, 800)}px`, height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={filteredHistory}
+                margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="max"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  dot={{ r: 2 }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      
+      </div>
 
       {/* Related Exercises */}
       <RelatedExercises currentExercise={exercise} />

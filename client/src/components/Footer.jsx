@@ -55,7 +55,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <a 
-                  href="https://github.com/austintran/exercise-catalog/issues"
+                  href="https://github.com/austin616/exercise-catalog/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-base text-gray-500 hover:text-gray-900 transition-colors"
@@ -65,7 +65,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="https://github.com/austintran/exercise-catalog/blob/main/README.md"
+                  href="https://github.com/austin616/exercise-catalog/blob/main/README.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-base text-gray-500 hover:text-gray-900 transition-colors"
@@ -75,7 +75,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="https://github.com/austintran/exercise-catalog/blob/main/CONTRIBUTING.md"
+                  href="https://github.com/austin616/exercise-catalog/blob/main/CONTRIBUTING.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-base text-gray-500 hover:text-gray-900 transition-colors"
@@ -93,7 +93,7 @@ const Footer = () => {
             </h3>
             <div className="flex space-x-6">
               <a
-                href="https://github.com/austintran/exercise-catalog"
+                href="https://github.com/austin616/exercise-catalog"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-gray-500 transition-colors"

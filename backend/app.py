@@ -412,6 +412,31 @@ def get_exercise_history(exercise):
         print("🔥 Error fetching exercise history:", str(e))
         return jsonify({'error': 'Server error', 'message': str(e)}), 500
 
+# New route: POST exercise history for a specific exercise name
+@app.route('/api/exercise_history/<string:exercise>', methods=['POST'])
+@login_required
+def post_exercise_history_with_name(exercise):
+    try:
+        data = request.get_json()
+        sets = data.get('sets', [])
+        date = data.get('date')
+
+        if not sets or not date:
+            return jsonify({'error': 'Missing sets or date'}), 400
+
+        history = ExerciseHistory(
+            user_id=current_user.id,
+            exercise=exercise,
+            date=date,
+            sets=sets
+        )
+        db.session.add(history)
+        db.session.commit()
+        return jsonify({'message': 'History saved'}), 201
+    except Exception as e:
+        print("🔥 Error posting exercise history with name:", str(e))
+        return jsonify({'error': 'Server error', 'message': str(e)}), 500
+
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)

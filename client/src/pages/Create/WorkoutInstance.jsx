@@ -6,8 +6,9 @@ import axios from 'axios';
 import WorkoutForm from './components/WorkoutForm';
 import { FaDumbbell, FaStickyNote, FaCalendar, FaCheckSquare, FaRegSquare } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { toast } from 'react-toastify';
 import exerciseJson from '../../../../backend/dist/exercises.json';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const WorkoutInstance = () => {
   const { id } = useParams();
@@ -29,16 +30,16 @@ const WorkoutInstance = () => {
               weight: parseInt(set.weight) || 0,
             }));
 
+            const exerciseId = (exerciseJson.find(e => e.name === exercise.name)?.id) || exercise.name;
             axios.post(
-              'http://127.0.0.1:5000/api/exercise_history',
+              `http://127.0.0.1:5000/api/exercise_history/${encodeURIComponent(exerciseId)}`,
               {
-                exercise: exercise.name,
                 sets: setData,
                 date: res.data.date
               },
               { withCredentials: true }
             ).then(() => {
-              toast.success(`Saved history for ${exercise.name}`);
+                console.log('Exercise history posted successfully');
             }).catch(err => {
               console.error('Error posting exercise history:', err);
             });
@@ -127,7 +128,7 @@ const WorkoutInstance = () => {
               <div key={exIdx} className="border border-gray-200 bg-gray-50 rounded-xl p-4 shadow-sm">
                 <Link
                   to={`/exercises/instance/${
-                    (exerciseJson.find(e => e.name === exercise.name)?.id) || exercise.name.replace(/\s+/g, '_').replace(/\//g, '_')
+                    (exerciseJson.find(e => e.name === exercise.name)?.id) || encodeURIComponent(exercise.name)
                   }`}
                   className="flex items-center gap-2 mb-4"
                 >

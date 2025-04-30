@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaBars, FaHeart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
   const [user, setUser] = useState(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleNavClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -83,13 +89,6 @@ const Navbar = () => {
     window.location.href = 'http://127.0.0.1:5000/api/auth/login';
   };
 
-  const handleLogout = () => {
-    const confirmed = window.confirm('Are you sure you want to log out?');
-    if (confirmed) {
-      window.location.href = 'http://127.0.0.1:5000/api/auth/logout';
-    }
-  };
-
   return (
     <div 
       className={`fixed top-0 left-0 right-0 z-50 py-4 px-8 flex items-center bg-gray-800 text-white transition-all duration-500 ${
@@ -142,7 +141,7 @@ const Navbar = () => {
         {/* Profile Button */}
         {user ? (
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutDialog(true)}
             className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-2"
           >
             <FaUser className="text-white" size={25} />
@@ -220,7 +219,7 @@ const Navbar = () => {
           </Link>
           {user ? (
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutDialog(true)}
               className="flex items-center bg-gray-700 hover:bg-gray-600 transition-colors duration-300 rounded-full p-4"
             >
               <FaUser className="text-white" size={15} />
@@ -237,6 +236,43 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      <Dialog
+  open={showLogoutDialog}
+  onClose={() => setShowLogoutDialog(false)}
+  PaperProps={{
+    style: {
+      borderRadius: '12px',
+      padding: '24px',
+      minWidth: '320px',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+    },
+  }}
+>
+  <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.5rem' }}>
+    Confirm Logout
+  </DialogTitle>
+  <DialogContent sx={{ textAlign: 'center', mb: 2 }}>
+    <p style={{ fontSize: '1.1rem', marginTop: '8px' }}>Are you sure you want to log out?</p>
+  </DialogContent>
+  <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+    <Button
+      variant="outlined"
+      color="primary"
+      onClick={() => setShowLogoutDialog(false)}
+    >
+      Cancel
+    </Button>
+    <Button
+      variant="contained"
+      color="error"
+      onClick={() => {
+        window.location.href = 'http://127.0.0.1:5000/api/auth/logout';
+      }}
+    >
+      Log Out
+    </Button>
+  </DialogActions>
+</Dialog>
     </div>
   );
 };
