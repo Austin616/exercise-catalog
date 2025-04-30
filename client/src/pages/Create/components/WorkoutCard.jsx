@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, isSameDay } from 'date-fns';
 import { motion } from 'framer-motion';
+import WorkoutDay from './WorkoutDay';
+
 
 const WorkoutCard = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -72,28 +74,12 @@ const WorkoutCard = () => {
             {daysOfWeek.map((date) => {
               const workoutsForDate = getWorkoutsForDate(date);
               return (
-                <div
+                <WorkoutDay
                   key={date.toString()}
-                  className="bg-white shadow-sm border border-gray-200 rounded-2xl px-6 py-5 hover:shadow-md transition-all duration-200 w-full flex flex-col justify-between"
-                >
-                  <h3 className="text-base font-semibold text-gray-900 mb-4">{format(date, 'EEEE, MMM d')}</h3>
-                  <div className="space-y-3">
-                    {workoutsForDate.length > 0 ? (
-                      workoutsForDate.map((workout) => (
-                        <div key={workout.id} className="p-2 bg-gray-100 rounded-md hover:bg-gray-200 cursor-pointer transition">
-                          <p
-                            className="text-sm text-blue-700 font-semibold"
-                            onClick={() => navigate(`/workouts/${workout.id}`)}
-                          >
-                            {workout.name}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-gray-400 italic">No workouts saved for this date.</p>
-                    )}
-                  </div>
-                </div>
+                  date={date}
+                  workouts={workoutsForDate}
+                  onNavigate={navigate}
+                />
               );
             })}
           </div>

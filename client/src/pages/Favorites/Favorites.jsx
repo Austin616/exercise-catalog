@@ -162,18 +162,15 @@ const Favorites = () => {
 
   if (notLoggedIn) {
     return (
-      <div className="px-4 py-8">
-        <div className="text-center text-gray-600">
-          <p className="text-lg font-medium">Please log in to view your favorite exercises.</p>
-        </div>
-        <div className="mt-4 flex justify-center">
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
-            onClick={() => window.location.href = 'http://127.0.0.1:5000/api/auth/login'}
-          >
-            Log In
-          </button>
-          </div>
+      <div className="p-8 text-center max-w-xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Please Log In</h2>
+        <p className="text-gray-600 mb-6">You must be logged in to view your favorite exercises.</p>
+        <a
+          href="http://127.0.0.1:5000/api/auth/login"
+          className="inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition"
+        >
+          Log In
+        </a>
       </div>
     );
   }

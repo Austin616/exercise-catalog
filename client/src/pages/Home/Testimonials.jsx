@@ -14,7 +14,7 @@ const testimonials = [
     content: "I recommend this platform to all my clients. The variety of exercises and clear categorization makes it easy to create custom workout plans.",
   },
   {
-    name: "Emily Rodriguez",
+    name: "Emily Davis",
     role: "Yoga Instructor",
     image: "https://randomuser.me/api/portraits/women/3.jpg",
     content: "The attention to detail in each exercise description is impressive. It's like having a personal trainer in your pocket!",
