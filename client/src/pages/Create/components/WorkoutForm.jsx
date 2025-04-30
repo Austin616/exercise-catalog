@@ -156,7 +156,7 @@ return (
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 50, opacity: 0 }}
       transition={{ duration: 0.4 }}
-      className="w-[600px] h-[80vh] mx-auto pt-16 pb-16 px-6 overflow-y-auto"
+      className="w-full max-w-md sm:max-w-2xl lg:max-w-3xl h-[90vh] sm:h-auto mx-auto pt-16 sm:pt-20 pb-24 sm:pb-32 px-4 sm:px-6 overflow-y-auto"
     >
       
         <form className="bg-white shadow-xl rounded-2xl px-10 py-8 mb-6 border border-gray-100 space-y-6">
