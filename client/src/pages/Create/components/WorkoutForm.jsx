@@ -91,7 +91,7 @@ const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, 
       // Delete old exercise history entries if editing an existing workout
       if (workoutId) {
         try {
-          await axios.delete(`http://127.0.0.1:5000/api/exercise_history/workout/${workoutId}`, {
+          await axios.delete(`https://exercise-catalog.onrender.com/api/exercise_history/workout/${workoutId}`, {
             withCredentials: true,
           });
         } catch (error) {
@@ -105,8 +105,8 @@ const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, 
         exercises: exercisesInWorkout,
       };
       const url = workoutId
-        ? `http://127.0.0.1:5000/api/workouts/${workoutId}`
-        : 'http://127.0.0.1:5000/api/workouts';
+        ? `https://exercise-catalog.onrender.com/api/workouts/${workoutId}`
+        : 'https://exercise-catalog.onrender.com/api/workouts';
       const method = workoutId ? 'put' : 'post';
 
       const res = await axios[method](url, payload, { withCredentials: true });
@@ -129,7 +129,7 @@ const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, 
   const handleDelete = async () => {
     if (!workoutId) return;
     try {
-      await axios.delete(`http://127.0.0.1:5000/api/workouts/${workoutId}`, { withCredentials: true });
+      await axios.delete(`https://exercise-catalog.onrender.com/api/workouts/${workoutId}`, { withCredentials: true });
       toast.success('Workout deleted successfully');
       window.location.href = '/create';
     } catch (err) {
