@@ -13,6 +13,7 @@ import MuscleGroup from './pages/Exercises/MuscleGroup'
 import ExerciseInstance from './pages/Exercises/ExerciseInstance'
 import Create from './pages/Create/Create'
 import Favorites from './pages/Favorites/Favorites'
+import WorkoutInstance from './pages/Create/WorkoutInstance'
 import Layout from './Layout'
 import NotFound from './pages/NotFound'
 import "./App.css"
@@ -32,7 +33,8 @@ const App = () => {
             <Route path="/create" element={<Layout><Create /></Layout>} />
             <Route path="*" element={<Layout><NotFound/></Layout>} />
             <Route path="/exercises/:id" element={<Layout><MuscleGroup/></Layout>} />
-            <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} /> 
+            <Route path="/exercises/instance/:id" element={<Layout><ExerciseInstance/></Layout>} />
+            <Route path="/workouts/:id" element={<Layout><WorkoutInstance/></Layout>} /> 
           </Routes>
         </main>
         <Footer />

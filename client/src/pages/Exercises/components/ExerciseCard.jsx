@@ -102,14 +102,14 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
       {/* Main Card Link */}
       <Link
         to={`/exercises/instance/${exercise.id}`}
-        className="group bg-white rounded-2xl shadow-md p-8 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 active:scale-95"
+        className="group bg-white rounded-2xl shadow-md p-8 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 active:scale-95"
       >
         <button
           onClick={handleFavoriteClick}
           className={`absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 ${
             isFavorite
-              ? "opacity-100 ring-2 ring-red-300 shadow-lg"
-              : "opacity-0 group-hover:opacity-100 hover:ring-2 hover:ring-red-300 hover:shadow-md"
+              ? "opacity-100 shadow-lg"
+              : "opacity-0 group-hover:shadow-lg group-hover:opacity-100 hover:shadow-md"
           }`}
           aria-label="Add to favorites"
         >

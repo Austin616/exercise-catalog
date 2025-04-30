@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from authlib.integrations.flask_client import OAuth
+import uuid
 
 # Load environment variables from .env file
 load_dotenv()
@@ -55,6 +56,34 @@ class Favorite(db.Model):
             'exercise_id': self.exercise_id,
             'exercise_name': self.exercise_name,
             'user_id': self.user_id,
+        }
+
+import json
+from sqlalchemy.types import TypeDecorator, TEXT
+
+class JsonEncodedList(TypeDecorator):
+    impl = TEXT
+    def process_bind_param(self, value, dialect):
+        return json.dumps(value)
+    def process_result_value(self, value, dialect):
+        return json.loads(value)
+
+class Workout(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(150), nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    notes = db.Column(db.Text)
+    exercises = db.Column(JsonEncodedList)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "date": self.date,
+            "notes": self.notes,
+            "exercises": self.exercises
         }
 
 @login_manager.user_loader
@@ -211,6 +240,78 @@ def delete_favorite(id):
     db.session.delete(favorite)
     db.session.commit()
     return jsonify({'message': 'Favorite deleted'})
+
+@app.route('/api/workouts', methods=['POST'])
+@login_required
+def save_workout():
+    try:
+        data = request.get_json()
+        print("Workout POST payload:", data)
+
+        name = data.get('name')
+        date = data.get('date')
+        notes = data.get('notes')
+        exercises = data.get('exercises')
+
+        if not name or not date:
+            return jsonify({'error': 'Missing name or date'}), 400
+
+        workout = Workout(
+            user_id=current_user.id,
+            name=name,
+            date=date,
+            notes=notes,
+            exercises=exercises
+        )
+        db.session.add(workout)
+        db.session.commit()
+
+        return jsonify(workout.to_dict()), 201
+    except Exception as e:
+        print("🔥 Error saving workout:", str(e))
+        return jsonify({'error': 'Server error', 'message': str(e)}), 500
+    
+
+@app.route('/api/workouts', methods=['GET'])
+@login_required
+def get_workouts():
+    workouts = Workout.query.filter_by(user_id=current_user.id).all()
+    return jsonify([workout.to_dict() for workout in workouts])
+
+@app.route('/api/workouts/<string:id>', methods=['GET'])
+@login_required
+def get_workout(id):
+    workout = Workout.query.filter_by(id=id, user_id=current_user.id).first()
+    if not workout:
+        return jsonify({'error': 'Workout not found'}), 404
+    return jsonify(workout.to_dict())
+
+@app.route('/api/workouts/<string:id>', methods=['DELETE'])
+@login_required
+def delete_workout(id):
+    workout = Workout.query.filter_by(id=id, user_id=current_user.id).first()
+    if not workout:
+        return jsonify({'error': 'Workout not found'}), 404
+
+    db.session.delete(workout)
+    db.session.commit()
+    return jsonify({'message': 'Workout deleted'})
+
+@app.route('/api/workouts/<string:id>', methods=['PUT'])
+@login_required
+def update_workout(id):
+    workout = Workout.query.filter_by(id=id, user_id=current_user.id).first()
+    if not workout:
+        return jsonify({'error': 'Workout not found'}), 404
+
+    data = request.get_json()
+    workout.name = data.get('name', workout.name)
+    workout.date = data.get('date', workout.date)
+    workout.notes = data.get('notes', workout.notes)
+    workout.exercises = data.get('exercises', workout.exercises)
+
+    db.session.commit()
+    return jsonify(workout.to_dict())
 
 @app.route('/api/current_user')
 def current_user_info():

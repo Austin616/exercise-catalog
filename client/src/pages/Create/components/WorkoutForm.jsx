@@ -8,13 +8,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const WorkoutForm = () => {
-  const [workoutName, setWorkoutName] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [notes, setNotes] = useState('');
+const WorkoutForm = ({ initialData = null, workoutId = null, onCancel, onSaved, canDelete = false }) => {
+  const [workoutName, setWorkoutName] = useState(initialData?.name || '');
+  const [date, setDate] = useState(initialData?.date ? new Date(initialData.date) : new Date());
+  const [notes, setNotes] = useState(initialData?.notes || '');
   const [favoriteExercises, setFavoriteExercises] = useState([]);
-  const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
+  const [exercisesInWorkout, setExercisesInWorkout] = useState(initialData?.exercises || []);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -60,15 +62,61 @@ const WorkoutForm = () => {
     setExercisesInWorkout(updated);
   };
 
-  const handleSubmit = (e) => {
-    console.log('Workout saved:', {
-      workoutName,
-      date,
-      notes,
-      exercisesInWorkout,
-    });
-  
-    // You can also add saving logic here (e.g. POST to your backend)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (exercisesInWorkout.length === 0) {
+      toast.error('Please add at least one exercise to the workout.');
+      return;
+    }
+    // Additional validation: at least one exercise with name and one set with reps and weight
+    const hasValidExercise = exercisesInWorkout.some(ex =>
+      ex.name &&
+      ex.sets &&
+      ex.sets.some(set => set.reps && set.weight)
+    );
+    if (!hasValidExercise) {
+      toast.error('Please fill out at least one set with reps and weight.');
+      return;
+    }
+    try {
+      const payload = {
+        name: workoutName,
+        date: date.toISOString(),
+        notes,
+        exercises: exercisesInWorkout,
+      };
+      const url = workoutId
+        ? `http://127.0.0.1:5000/api/workouts/${workoutId}`
+        : 'http://127.0.0.1:5000/api/workouts';
+      const method = workoutId ? 'put' : 'post';
+
+      const res = await axios[method](url, payload, { withCredentials: true });
+      console.log('posted url:', res);
+
+      console.log('Workout saved:', res.data);
+      if (onSaved) onSaved();
+      if (!workoutId) {
+        setWorkoutName('');
+        setDate(new Date());
+        setNotes('');
+        setExercisesInWorkout([]);
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Failed to save workout:', err.response?.data || err.message);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!workoutId) return;
+    try {
+      await axios.delete(`http://127.0.0.1:5000/api/workouts/${workoutId}`, { withCredentials: true });
+      toast.success('Workout deleted successfully');
+      window.location.href = '/create';
+    } catch (err) {
+      toast.error('Failed to delete workout');
+      console.error('Delete error:', err);
+    }
   };
 
   // Group exercises by muscle group for Select options
@@ -177,6 +225,7 @@ return (
                 >
                   <input
                     type="number"
+                    min={0}
                     placeholder="Reps"
                     value={set.reps}
                     onChange={(e) => updateSet(exIdx, setIdx, 'reps', e.target.value)}
@@ -184,6 +233,7 @@ return (
                   />
                   <input
                     type="number"
+                    min={0}
                     placeholder="Weight (lbs)"
                     value={set.weight}
                     onChange={(e) => updateSet(exIdx, setIdx, 'weight', e.target.value)}
@@ -224,13 +274,33 @@ return (
             />
           </div>
 
-          <button
-            type="submit"
-            className="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 transition text-sm"
-            onClick={handleSubmit}
-          >
-            <FaSave className="inline-block mr-2" /> Save Workout
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              type="submit"
+              className="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-700 transition text-sm"
+              onClick={handleSubmit}
+            >
+              <FaSave className="inline-block mr-2" /> Save Workout
+            </button>
+            {onCancel && (
+              <button
+                type="button"
+                className="text-sm text-gray-500 underline hover:text-gray-700"
+                onClick={onCancel}
+              >
+                Cancel
+              </button>
+            )}
+            {canDelete && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="text-sm text-red-600 underline hover:text-red-800 ml-4"
+              >
+                Delete Workout
+              </button>
+            )}
+          </div>
         </form>
       </motion.div>
   );
