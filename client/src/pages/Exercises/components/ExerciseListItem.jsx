@@ -98,7 +98,9 @@ const ExerciseListItem = ({ exercise }) => {
         </h3>
         <button
           onClick={handleFavoriteClick}
-          className="p-2 rounded-full shadow-lg transition-colors duration-300"
+          className={`p-2 rounded-full shadow-lg transition-colors duration-300 ${
+            isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
           title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           aria-label="Add to favorites"
         >

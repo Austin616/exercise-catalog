@@ -102,15 +102,14 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
       {/* Main Card Link */}
       <Link
         to={`/exercises/instance/${exercise.id}`}
-        className="group bg-white rounded-2xl shadow-md p-8 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 active:scale-95"
+        className="group bg-white rounded-2xl shadow-md p-8 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:ring-2 hover:ring-blue-300 active:scale-95"
       >
         <button
           onClick={handleFavoriteClick}
-          className={`absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 ${
-            isFavorite
-              ? "opacity-100 shadow-lg"
-              : "opacity-0 group-hover:shadow-lg group-hover:opacity-100 hover:shadow-md"
+          className={`absolute top-3 right-3 z-10 p-2 rounded-full bg-white shadow-lg transition-colors duration-300 ${
+            isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           }`}
+          title={isFavorite ? "Remove from favorites" : "Add to favorites"}
           aria-label="Add to favorites"
         >
           <svg
@@ -140,7 +139,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
         </div>
 
         {/* Exercise Name */}
-        <h2 className="text-2xl font-extrabold text-gray-800 mb-2">
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">
           {highlightText(exercise.name || "")}
         </h2>
 
@@ -149,7 +148,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
           {exercise.primaryMuscles?.map((muscle, index) => (
             <span
               key={index}
-              className="inline-block bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full"
+              className="inline-block bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full transition group-hover:scale-105"
             >
               {highlightText(muscle)}
             </span>
@@ -160,7 +159,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
         <div className="flex flex-wrap justify-center gap-2 text-xs mt-4">
           {exercise.force && (
             <span
-              className={`px-3 py-1 rounded-full font-medium capitalize ${
+              className={`px-3 py-1 rounded-full font-medium capitalize transition group-hover:scale-105 ${
                 tagColors.force.bg
               } ${tagColors.force.text} ${tagColors.force.hover} ${
                 isTagMatch(exercise.force) ? "ring-2 ring-yellow-400" : ""
@@ -171,7 +170,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
           )}
           {exercise.equipment && (
             <span
-              className={`px-3 py-1 rounded-full font-medium capitalize ${
+              className={`px-3 py-1 rounded-full font-medium capitalize transition group-hover:scale-105 ${
                 tagColors.equipment.bg
               } ${tagColors.equipment.text} ${tagColors.equipment.hover} ${
                 isTagMatch(exercise.equipment) ? "ring-2 ring-yellow-400" : ""
@@ -182,7 +181,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
           )}
           {exercise.level && (
             <span
-              className={`px-3 py-1 rounded-full font-medium capitalize ${
+              className={`px-3 py-1 rounded-full font-medium capitalize transition group-hover:scale-105 ${
                 tagColors.level.bg
               } ${tagColors.level.text} ${tagColors.level.hover} ${
                 isTagMatch(exercise.level) ? "ring-2 ring-yellow-400" : ""
@@ -193,7 +192,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
           )}
           {exercise.category && (
             <span
-              className={`px-3 py-1 rounded-full font-medium capitalize ${
+              className={`px-3 py-1 rounded-full font-medium capitalize transition group-hover:scale-105 ${
                 tagColors.category.bg
               } ${tagColors.category.text} ${tagColors.category.hover} ${
                 isTagMatch(exercise.category) ? "ring-2 ring-yellow-400" : ""
