@@ -2,6 +2,9 @@
 
 A full-stack web application for browsing, favoriting, and tracking exercises. Users can log workouts, view exercise details, and fetch related YouTube videos using the YouTube Data API.
 
+<img width="1438" alt="image" src="https://github.com/user-attachments/assets/d9d55579-b145-46ff-9f6b-2630679d28f6" />
+
+
 ## 🌐 Live Site
 **Frontend:** [exercise-catalog.vercel.app](https://exercise-catalog.vercel.app)  
 **Backend:** [exercise-catalog.onrender.com](https://exercise-catalog.onrender.com)
