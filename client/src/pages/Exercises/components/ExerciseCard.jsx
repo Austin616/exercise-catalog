@@ -61,7 +61,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
     if (isFavorite) {
       try {
         await axios.delete(
-          `http://127.0.0.1:5000/api/favorites/${favoriteId}`,
+          `https://exercise-catalog.onrender.com/api/favorites/${favoriteId}`,
           { withCredentials: true }
         );
         setIsFavorite(false);
@@ -76,7 +76,7 @@ const ExerciseCard = ({ exercise, searchTerm = "" }) => {
     } else {
       try {
         const res = await axios.post(
-          "http://127.0.0.1:5000/api/favorites",
+          "https://exercise-catalog.onrender.com/api/favorites",
           {
             exercise_id: exercise.id,
             exercise_name: exercise.name,
